@@ -1,7 +1,3 @@
-require('./bootstrap');
-
-require('alpinejs');
-
 function dropHandler(ev) {
     console.log('Fichero(s) arrastrados');
   
@@ -25,9 +21,3 @@ function dropHandler(ev) {
     }
   
   }
-  function dragOverHandler(ev) {
-    console.log('File(s) in drop zone');
-  
-    // Prevent default behavior (Prevent file from being opened)
-    ev.preventDefault();
-  }  

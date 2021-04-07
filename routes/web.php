@@ -13,10 +13,7 @@ use App\Http\Controllers\UploadedFileController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/dashboard');
 
 Route::get('/dashboard', [UploadedFileController::class, 'index'])->middleware(['auth'])->name('dashboard');
 Route::post("uploadFiles", [UploadedFileController::class, 'store'])->middleware(['auth'])->name("uploadFiles");
