@@ -17,7 +17,7 @@ class CreateUploadedFileResultsTable extends Migration
             $table->id();
             $table->foreignId('uploaded_file_id')->constrained();
             $table->string('result_status');
-            $table->text('result_description');
+            $table->json('result_description')->nullable();
             $table->timestamps();
         });
     }

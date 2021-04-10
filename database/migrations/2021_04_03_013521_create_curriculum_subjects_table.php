@@ -18,8 +18,8 @@ class CreateCurriculumSubjectsTable extends Migration
             $table->foreignId('academic_year_id')->constrained();
             $table->foreignId('curriculum_id')->constrained();
             $table->foreignId('subject_id')->constrained();
-            $table->string('type', 5);
-            $table->string('duration', 5);
+            $table->string('type', 5)->nullable();
+            $table->string('duration', 5)->nullable();
             $table->string('course')->nullable();
             $table->integer('part_time_course')->nullable();
             $table->text('comments')->nullable();

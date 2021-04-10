@@ -15,14 +15,13 @@ class CreateSubjectsTable extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('department_id')->constrained();
+            $table->foreignId('department_id')->nullable()->constrained();
             $table->foreignId('branch_id')->nullable()->constrained();
             $table->string('code', 15)->unique();
-            $table->string('name', 200);
+            $table->string('name', 200)->nullable();
             $table->string('english_name', 200)->nullable();
             $table->text('comments')->nullable();
             $table->integer('ects')->nullable();
-            $table->string('status', 15)->unique();
             $table->timestamps();
         });
     }

@@ -25,7 +25,7 @@ class UploadFilesRequest extends FormRequest
     {
         return [
             "excelFiles" => "required|array",
-            "excelFiles.*" => "required|mimes:xls,xlsx|max:3000",
+            "excelFiles.*" => "required|mimes:xls,xlsx|max:30000",
         ];
     }
 }

@@ -9,6 +9,9 @@ class ClassroomGroup extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['academic_year_id', 'subject_id', 'name', 'activity_id', 'activity_group', 'duration', 'language', 'capacity', 'capacity_left', 'location'];
+
+
     public function academicYear()
     {
         return $this->belongsTo(AcademicYear::class);

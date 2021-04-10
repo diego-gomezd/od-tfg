@@ -17,13 +17,14 @@ class CreateClassroomGroupsTable extends Migration
             $table->id();
             $table->foreignId('academic_year_id')->constrained();
             $table->foreignId('subject_id')->constrained();
-            $table->string('name', 200);
-            $table->string('activity_id', 45);
-            $table->string('activity_group', 45);
-            $table->string('language', 5);
-            $table->string('duration', 5);
+            $table->string('name', 200)->nullable();
+            $table->string('activity_id', 45)->nullable();
+            $table->string('activity_group', 45)->nullable();
+            $table->string('language', 5)->nullable();
+            $table->string('duration', 5)->nullable();
             $table->integer('capacity')->nullable();
             $table->integer('capacity_left')->nullable();
+            $table->string('location', 100)->nullable();
             $table->timestamps();
         });
     }

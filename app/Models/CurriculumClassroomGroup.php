@@ -9,6 +9,9 @@ class CurriculumClassroomGroup extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['classroom_group_id', 'curriculum_subject_id'];
+
+
     public function classroomGroup()
     {
         return $this->belongsTo(ClassroomGroup::class);

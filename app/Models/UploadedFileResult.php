@@ -13,4 +13,17 @@ class UploadedFileResult extends Model
     {
         return $this->belongsTo(UploadedFile::class);
     }
+
+    protected $casts = [
+        'result_description' => 'array'
+    ];
+
+    public function addResult(array $row)
+    {
+        if ($this->result_description == null)
+        {
+            $this->result_description = array();
+        }
+        $this->result_description = array_merge($this->result_description, $row);
+    }
 }

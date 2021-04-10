@@ -14,7 +14,12 @@ class AcademicYearController extends Controller
      */
     public function index()
     {
-        //
+        
+    //    $excelFiles = UploadedFile::orderBy('name', 'asc')->get();
+
+        return view('dashboard', [
+            'excelFiles' => $excelFiles
+        ]);
     }
 
     /**
