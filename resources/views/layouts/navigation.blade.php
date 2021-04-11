@@ -12,8 +12,26 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard') || request()->routeIs('/')">
                         {{ __('Dashboard') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('curriculumAcademicYears.index')" :active="request()->routeIs('curriculumAcademicYears.*') || request()->routeIs('curriculumSubjects.*')">
+                        {{ __('Oferta Docente') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('academicYears.index')" :active="request()->routeIs('academicYears.*')">
+                        {{ __('Cursos académicos') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('curriculums.index')" :active="request()->routeIs('curriculums.*')">
+                        {{ __('Planes de Estudios') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('subjects.index')" :active="request()->routeIs('subjects.*')">
+                        {{ __('Asignaturas') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('departments.index')" :active="request()->routeIs('departments.*')">
+                        {{ __('Departamentos') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('uploadedFiles.index')" :active="request()->routeIs('uploadedFiles.*')">
+                        {{ __('Ficheros subidos') }}
                     </x-nav-link>
                 </div>
             </div>

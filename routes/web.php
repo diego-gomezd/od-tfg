@@ -1,7 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CurriculumController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\UploadedFileController;
+use App\Http\Controllers\CurriculumSubjectController;
+use App\Http\Controllers\CurriculumAcademicYearController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,9 +20,32 @@ use App\Http\Controllers\UploadedFileController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::redirect('/', '/dashboard');
+Route::redirect('/', 'dashboard');
 
-Route::get('/dashboard', [UploadedFileController::class, 'index'])->middleware(['auth'])->name('dashboard');
-Route::post("uploadFiles", [UploadedFileController::class, 'store'])->middleware(['auth'])->name("uploadFiles");
+Route::resource('uploadedFiles', UploadedFileController::class)->only([
+    'index', 'store'
+])->middleware(['auth']);
+
+Route::resource('curriculumAcademicYears', CurriculumAcademicYearController::class)->only([
+    'index'
+])->middleware(['auth']);
+
+Route::resource('curriculumSubjects', CurriculumSubjectController::class)->only([
+    'destroy', 'store', 'edit', 'update'
+])->middleware(['auth']);
+
+Route::resource('curriculums', CurriculumController::class)->middleware(['auth']);
+Route::resource('academicYears', AcademicYearController::class)->middleware(['auth']);
+Route::resource('departments', DepartmentController::class)->middleware(['auth']);
+Route::resource('subjects', SubjectController::class)->middleware(['auth']);
+
+Route::post('subjects/filter', [SubjectController::class, 'filter'])->middleware(['auth'])->name('subjects.filter');
+Route::post('curriculumAcademicYears/filter', [CurriculumAcademicYearController::class, 'filter'])->middleware(['auth'])->name('curriculumAcademicYears.filter');
+
+Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}', [CurriculumSubjectController::class, 'index'])->middleware(['auth'])->name('curriculumSubjects.index');
+Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}/create', [CurriculumSubjectController::class, 'create'])->middleware(['auth'])->name('curriculumSubjects.create');
+Route::post('curriculumSubjects/{academic_year_id}/{curriculum_id}/filter', [CurriculumSubjectController::class, 'filter'])->middleware(['auth'])->name('curriculumSubjects.filter');
+
+Route::get('dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 require __DIR__.'/auth.php';

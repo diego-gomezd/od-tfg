@@ -30,9 +30,9 @@ class UploadedFileController extends Controller
      */
     public function index()
     {
-        $excelFiles = UploadedFile::orderBy('status', 'asc')->orderBy('created_at', 'desc')->get();
+        $excelFiles = UploadedFile::orderBy('status', 'asc')->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('dashboard', [
+        return view('uploadedFiles.index', [
             'excelFiles' => $excelFiles
         ]);
     }
@@ -98,11 +98,12 @@ class UploadedFileController extends Controller
                 //Procesar filas
                 $result_file = new UploadedFileResult();
                 $result_file->uploaded_file_id = $uploaded_file->id;
-                $this->proces_excel($data, $result_file);
+                $format = $this->proces_excel($data, $result_file);
                 $result_file->save();
                 
                 //Modificar el registro
                 $uploaded_file->status = 'FINISHED';
+                $uploaded_file->format = $format;
                 $uploaded_file->save();
             } catch (Exception $e) {
                 Log::debug($e->getMessage());
@@ -171,6 +172,7 @@ class UploadedFileController extends Controller
         } else {
             $file_result->result_status = 'OK';
         }
+        return $format;
     }
 
     private function determine_excel_format(array $header)

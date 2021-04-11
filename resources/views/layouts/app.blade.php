@@ -14,10 +14,9 @@
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
         <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}" defer></script>
+        <script src="{{ asset('js/app.js') }}" ></script>
     </head>
     <body class="font-sans antialiased">
-    Layout app
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 
@@ -30,6 +29,25 @@
 
             <!-- Page Content -->
             <main>
+            @if (session('success'))
+            <x-information-label :type="'success'" :message="session('success')" />
+            @endif
+            @if (session('error'))
+            <x-information-label :type="'error'" :message="session('error')" />
+            @endif
+            @if (session('warning'))
+            <x-information-label :type="'warning'" :message="session('warning')" />
+            @endif
+            @if (session('info'))
+            <x-information-label :type="'info'" :message="session('info')" />
+            @endif
+
+            @if ($errors->any())
+            @foreach ($errors->all() as $error)
+            <x-information-label :type="'error'" :message="$error" />
+            @endforeach
+            @endif
+
                 {{ $slot }}
             </main>
         </div>

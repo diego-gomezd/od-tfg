@@ -4,82 +4,76 @@ namespace App\Http\Controllers;
 
 use App\Models\Curriculum;
 use Illuminate\Http\Request;
+use App\Models\CurriculumSubject;
+use Illuminate\Routing\Controller;
+use App\Http\Requests\CurriculumRequest;
 
 class CurriculumController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        return view('curriculums.index', [
+            'curriculums' => Curriculum::paginate(10)
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
+        return view('curriculums.create', [
+            'curriculum' => new Curriculum()
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function store(CurriculumRequest $request)
     {
-        //
+        $curriculum = new Curriculum();
+        $curriculum->code = $request->input('code');
+        $curriculum->name = $request->input('name');
+        $curriculum->save();
+
+        return redirect()->route('curriculums.index')->with('success', 'Plan de Estudios \''.$curriculum->name.'\'insertado.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Curriculum  $curriculum
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Curriculum $curriculum)
     {
-        //
+        return view('curriculums.show', [
+            'curriculum' => Curriculum::find($curriculum->id)
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Curriculum  $curriculum
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Curriculum $curriculum)
     {
-        //
+        return view('curriculums.edit', [
+            'curriculum' => Curriculum::find($curriculum->id)
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Curriculum  $curriculum
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Curriculum $curriculum)
     {
-        //
+        $curriculum->code = $request->input('code');
+        $curriculum->name = $request->input('name');
+
+        if (Curriculum::where('id', '!=', $curriculum->id)->where(function($query) use ($request) {
+                $query->orWhere('name', $request->input('name'))
+                      ->orWhere('code', $request->input('code'));
+            })->first() == null)
+        {
+            $curriculum->update();
+            return redirect()->route('curriculums.index')->with('success', 'Plan de Estudios actualizado.');
+        }
+        $request->session()->flash('warning','Ya existe un Plan de Estudios con ese nombre o código.'); 
+        return view('curriculums.edit', ['curriculum' => $curriculum]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Curriculum  $curriculum
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Curriculum $curriculum)
     {
-        //
+        $count = CurriculumSubject::where('curriculum_id', $curriculum->id)->count();
+        if ($count == 0)
+        {
+            $curriculum->delete();
+            return redirect()->route('curriculums.index')->with('success', 'Plan de Estudios \''.$curriculum->name.'\' eliminado.');
+        }
+        return redirect()->route('curriculums.index')->with('error', 'No se puede eliminar el Plan de Estudios '.$curriculum->name.' porque hay Ofertas Docentes que lo incluyen.');
     }
 }
