@@ -115,15 +115,25 @@ class CurriculumSubjectController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function store(CurriculumSubjectRequest $request)
     {
-        //
+        $curriculum = Curriculum::find($request->curriculum_id);
+        $academic_year = AcademicYear::find($request->academic_year_id);
+
+        $curriculumSubject = new CurriculumSubject();
+        $curriculumSubject->academic_year_id = $academic_year->id;
+        $curriculumSubject->curriculum_id -> $curriculum->id;
+        $curriculumSubject->subject_id -> $request->input('subject_id');
+        $curriculumSubject->type -> $request->input('type');
+        $curriculumSubject->duration -> $request->input('duration');
+        $curriculumSubject->course -> $request->input('course');
+
+        $curriculumSubject.save();
+
+        return redirect()->route('curriculumSubjects.index', [
+            $curriculumSubject->academic_year_id,
+            $curriculumSubject->curriculum_id,
+        ])->with('success', 'Asignatura '.$curriculumSubject->subject->name.' insertada.');
     }
 
     public function show(CurriculumSubject $curriculumSubject)
@@ -163,7 +173,7 @@ class CurriculumSubjectController extends Controller
      * @param  \App\Models\CurriculumSubject  $curriculumSubject
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CurriculumSubject $curriculumSubject)
+    public function update(CurriculumSubjectRequest $request, CurriculumSubject $curriculumSubject)
     {
         //
     }
