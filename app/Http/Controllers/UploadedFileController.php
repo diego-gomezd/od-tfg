@@ -59,6 +59,7 @@ class UploadedFileController extends Controller
               //  ProcessUploadedFile::dispatchAfterResponse($uploadedFile);
             }
         }
+        return redirect()->route('uploadedFiles.index')->with('success', 'Fichero(s) almacenado. Se procesaran automáticamente');
     }
 
 
