@@ -44,7 +44,7 @@ class UploadedFileController extends Controller
     {
         foreach ($request->file("excelFiles") as $excelFile) {
             //Guardar fichero en SFTP
-            $path = $excelFile->store('uploads', 'sftp');
+            $path = $excelFile->store('uploads');
             if ($path)
             {
                 //Almacenar registro en BBDD
