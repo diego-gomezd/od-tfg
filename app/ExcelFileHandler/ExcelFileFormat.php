@@ -16,7 +16,7 @@ class ExcelFileFormat {
             }
             $i++;
         }
-        return $format;
+        return $valid;
     }
 
     protected function validateEmptyColumn($value, $mandatory, $errorMsg, &$status)
