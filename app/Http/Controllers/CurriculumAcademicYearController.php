@@ -6,8 +6,12 @@ use App\Models\Curriculum;
 use App\Models\Department;
 use App\Models\AcademicYear;
 use Illuminate\Http\Request;
+use App\Models\CurriculumSubject;
 use Illuminate\Routing\Controller;
 use App\Models\CurriculumAcademicYear;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\ExcelFileHandler\ExelFileFormatOD;
 
 class CurriculumAcademicYearController extends Controller
 {
@@ -41,13 +45,29 @@ class CurriculumAcademicYearController extends Controller
             'academic_years' => AcademicYear::all(['id', 'name'])->sortBy('name'),
             'curriculums' => Curriculum::all(['id', 'name'])->sortBy('name'),
         ]);
-
-
-        return view('subjects.index', [
-            'subjects' => $subjects,
-            'departments' => Department::all(['id', 'name'])->sortBy('name'),
-            'filter_subject_name' => $filter_name,
-            'filter_department_id' => $filter_department_id,
-        ]);
     }
+
+
+    public function export(Request $request) {
+        $format = $request->export_format;
+        $academic_year = AcademicYear::find($request->academic_year_id);
+        $curriculum = Curriculum::find($request->curriculum_id);
+        $subjects = CurriculumSubject::where('academic_year_id', $academic_year->id)->
+            where('curriculum_id', $curriculum->id)->get();
+
+        $file_name = $format.'_'.$curriculum->code.'_'.$academic_year->name.'.xlsx';
+        $file_path = public_path($file_name);
+
+        if ($format == 'OD') {
+            $excelFileFormat = new ExelFileFormatOD();
+            $excelFileFormat->generateExcelFile($academic_year, $curriculum, $subjects, $file_path);
+        }
+
+        return response()->download($file_path);
+    }
+
+
+
+
+
 }

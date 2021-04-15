@@ -1,7 +1,8 @@
 <x-app-layout>
-    <x-slot name="header">
+<x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            <a href="{{ route('subjects.index') }}">{{ __('Asignaturas') }}</a> > {{$subject->name}}
+        <a href="{{route('curriculumSubjects.index', ['academic_year_id' => $academic_year->id, 'curriculum_id' => $curriculum->id])}}" >
+            {{$academic_year->name}} > {{$curriculum->name}}</a> > Actualizar asignatura
         </h2>
     </x-slot>
 
@@ -9,16 +10,17 @@
         <div class="flex flex-col overflow-x-auto -my-2 sm:-mx-6 lg:-mx-8">
             <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                 <div class="py-2 align-middle inline-block min-w-full">
-                    <form method="post" action="{{ route('subjects.update', $subject->id) }}">
+                <form method="post" action="{{ route('curriculumSubjects.update', $curriculumSubject) }}">
                         @method('PUT')
                         @csrf
                         <div class="shadow sm:rounded-md sm:overflow-hidden">
                             <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
-                                <x-subject-component :subject="$subject" :departments="$departments" />
+                            <x-curriculum-subject-component :curriculumSubject="$curriculumSubject" :subjects="$subjects"
+                                    :courses="$courses" :durations="$durations" :types="$types" disabled />
                             </div>
                             <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
                             <x-button>{{ __('Actualizar') }}</x-buton>
-                            <x-abutton href="{{ route('subjects.index')}}">{{ __('Cancelar') }}</x-abutton>
+                            <x-abutton href="{{route('curriculumSubjects.index', ['academic_year_id' => $academic_year->id, 'curriculum_id' => $curriculum->id])}}">{{ __('Cancelar') }}</x-abutton>
                             </div>
                         </div>
                     </form>

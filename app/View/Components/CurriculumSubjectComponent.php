@@ -10,7 +10,7 @@ class CurriculumSubjectComponent extends Component
     public $subjects;
     public $courses;
     public $durations;
-    public $types; 
+    public $types;
 
     /**
      * Create a new component instance.

@@ -1,0 +1,8 @@
+<?php
+
+namespace App\Http\Controllers;
+
+abstract class ExcelFileFormat {
+    const OD_COLUMNS_FORMAT = array('AÑO','DPTO','NOM-DPTO','PLAN','NOM-PLAN','ASIG','NOM-ASIG','CRED','ESTADO','DURAC','TIPO-ASIG','OBSERVACIONES');
+    const GD_COLUMNS_FORMAT = array('AÑO','PLAN','NOM_PLAN','ID-ACTIVIDAD','GRUPO_ACTIV','NOMBRE_GRUPO','ASIG','NOM_ASIGNATURA','IDIOMA','DURACIÓN','CAP','CAP_RES','OBSERVACIONES');
+}

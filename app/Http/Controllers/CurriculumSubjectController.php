@@ -6,11 +6,16 @@ use App\Models\Subject;
 use App\Models\Curriculum;
 use App\Models\Department;
 use App\Models\AcademicYear;
+use App\Models\Combos\Combo;
 use Illuminate\Http\Request;
+use App\Models\Combos\Course;
+use App\Models\Combos\Duration;
 use App\Models\CurriculumSubject;
+use App\Models\Combos\SubjectType;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use App\Models\CurriculumClassroomGroup;
+use App\Http\Requests\CurriculumSubjectRequest;
 
 class CurriculumSubjectController extends Controller
 {
@@ -59,21 +64,8 @@ class CurriculumSubjectController extends Controller
         if (!empty($filter_type)) {
             $query->where('type', $filter_type);
         }
-
-        $aux = $query->get();
-        $curriculumSubjects = $query->orderBy('name', 'asc')->paginate(10)->withQueryString();
-
-        $courses = $aux->map(function ($values) {
-            $values->course;
-        })->unique()->all();
-        $durations = $aux->map(function ($values) {
-            return $values->duration;
-        })->unique()->all();
-        $types = $aux->map(function ($values) {
-            return $values->type;
-        })->unique()->all();
- 
-
+        $curriculumSubjects = $query->orderBy('course', 'asc')->orderBy('duration', 'asc')->paginate(10)->withQueryString();
+            
         $curriculum = Curriculum::find($curriculum_id);
         $academic_year = AcademicYear::find($academic_year_id);
 
@@ -88,9 +80,9 @@ class CurriculumSubjectController extends Controller
             'filter_course' => $filter_course,
             'filter_duration' => $filter_duration,
             'filter_type' => $filter_type,
-            'courses' => $courses,
-            'durations' => $durations,
-            'types' => $types,
+            'courses' => Course::getCombo(),
+            'durations' => Duration::getCombo(),
+            'types' => SubjectType::getCombo(),
             'departments' => Department::all(['id', 'name'])->sortBy('name'),
         ]);
     }
@@ -108,9 +100,9 @@ class CurriculumSubjectController extends Controller
             'curriculum' => $curriculum,
             'academic_year' => $academic_year,
             'curriculumSubject' => $curriculumSubject,
-            'courses' => ['1º', '2º', '3º', '4º'],
-            'durations' => ['C1', 'C2', 'TF'],
-            'types' => ['T', 'B', 'P', 'O'],
+            'courses' => Course::getCombo(),
+            'durations' => Duration::getCombo(),
+            'types' => SubjectType::getCombo(),
             'subjects' => Subject::all()->sortBy('name'),
         ]);
     }
@@ -122,18 +114,28 @@ class CurriculumSubjectController extends Controller
 
         $curriculumSubject = new CurriculumSubject();
         $curriculumSubject->academic_year_id = $academic_year->id;
-        $curriculumSubject->curriculum_id -> $curriculum->id;
-        $curriculumSubject->subject_id -> $request->input('subject_id');
-        $curriculumSubject->type -> $request->input('type');
-        $curriculumSubject->duration -> $request->input('duration');
-        $curriculumSubject->course -> $request->input('course');
+        $curriculumSubject->curriculum_id = $curriculum->id;
+        $curriculumSubject->subject_id = $request->input('subject_id');
+        $curriculumSubject->type = $request->input('type');
+        $curriculumSubject->duration = $request->input('duration');
+        $curriculumSubject->course = $request->input('course');
 
-        $curriculumSubject.save();
+        if (CurriculumSubject::where('academic_year_id', $curriculumSubject->academic_year_id)->
+            where('curriculum_id', $curriculumSubject->curriculum_id)->
+            where('subject_id', $curriculumSubject->subject_id)->first() == null)
+            {
+                $curriculumSubject->save();
 
-        return redirect()->route('curriculumSubjects.index', [
+                return redirect()->route('curriculumSubjects.index', [
+                    $curriculumSubject->academic_year_id,
+                    $curriculumSubject->curriculum_id,
+                ])->with('success', 'Asignatura '.$curriculumSubject->subject->name.' insertada.');
+            }
+        
+        return redirect()->route('curriculumSubjects.create', [
             $curriculumSubject->academic_year_id,
             $curriculumSubject->curriculum_id,
-        ])->with('success', 'Asignatura '.$curriculumSubject->subject->name.' insertada.');
+        ])->with('error', 'Ya existe la asignatura '.$curriculumSubject->subject->name.' en el Plan de Estudios.');  
     }
 
     public function show(CurriculumSubject $curriculumSubject)
@@ -145,9 +147,10 @@ class CurriculumSubjectController extends Controller
             'curriculum' => $curriculum,
             'academic_year' => $academic_year,
             'curriculumSubject' => $curriculumSubject,
-            'courses' => ['1º', '2º', '3º', '4º'],
-            'durations' => ['C1', 'C2', 'TF'],
-            'types' => ['T', 'B', 'P', 'O'],
+            'courses' => Course::getCombo(),
+            'durations' => Duration::getCombo(),
+            'types' => SubjectType::getCombo(),
+            'subjects' => Subject::all()->sortBy('name'),
         ]);
     }
 
@@ -156,31 +159,44 @@ class CurriculumSubjectController extends Controller
         $curriculum = Curriculum::find($curriculumSubject->curriculum_id);
         $academic_year = AcademicYear::find($curriculumSubject->academic_year_id);
 
-        return view('curriculumSubjects.show', [
+        return view('curriculumSubjects.edit', [
             'curriculum' => $curriculum,
             'academic_year' => $academic_year,
             'curriculumSubject' => $curriculumSubject,
-            'courses' => ['1º', '2º', '3º', '4º'],
-            'durations' => ['C1', 'C2', 'TF'],
-            'types' => ['T', 'B', 'P', 'O'],
+            'courses' => Course::getCombo(),
+            'durations' => Duration::getCombo(),
+            'types' => SubjectType::getCombo(),
+            'subjects' => Subject::all()->sortBy('name'),
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CurriculumSubject  $curriculumSubject
-     * @return \Illuminate\Http\Response
-     */
     public function update(CurriculumSubjectRequest $request, CurriculumSubject $curriculumSubject)
     {
-        //
-    }
+        $curriculumSubject->type = $request->input('type');
+        $curriculumSubject->duration = $request->input('duration');
+        $curriculumSubject->course = $request->input('course');
+
+        if (CurriculumSubject::where('id', '!=', $curriculumSubject->id)->
+            where('academic_year_id', $curriculumSubject->academic_year_id)->
+            where('curriculum_id', $curriculumSubject->curriculum_id)->
+            where('subject_id', $curriculumSubject->subject_id)->first() == null)
+            {
+                $curriculumSubject->update();
+
+                return redirect()->route('curriculumSubjects.index', [
+                    $curriculumSubject->academic_year_id,
+                    $curriculumSubject->curriculum_id,
+                ])->with('success', 'Asignatura '.$curriculumSubject->subject->name.' actualizada.');
+            }
+
+            return redirect()->route('curriculumSubjects.create', [
+                $curriculumSubject->academic_year_id,
+                $curriculumSubject->curriculum_id,
+            ])->with('error', 'Ya existe la asignatura '.$curriculumSubject->subject->name.' en el Plan de Estudios.');  
+        }    
 
     public function destroy(CurriculumSubject $curriculumSubject)
     {
- 
         $count_classroom = CurriculumClassroomGroup::where('curriculum_subject_id', $curriculumSubject->id)->count();
         if ($count_classroom > 0) {
             return redirect()->route('curriculumSubjects.index', 

@@ -2,18 +2,21 @@
 
 namespace App\Jobs;
 
-use App\Models\UploadedFile;
+use Exception;
 
+use App\Models\UploadedFile;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Models\UploadedFileResult;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-
 use PhpOffice\PhpSpreadsheet\IOFactory;
+
+use Illuminate\Queue\InteractsWithQueue;
+use App\ExcelFileHandler\ExelFileFormatGD;
+use App\ExcelFileHandler\ExelFileFormatOD;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 
 class ProcessUploadedFile implements ShouldQueue
 {
@@ -38,40 +41,75 @@ class ProcessUploadedFile implements ShouldQueue
      */
     public function handle()
     {
-        Log::debug('ProcessUploadedFile handle');
+        //Marcamo que estamos procesando el fichero
+        $this->uploadedFile->status = 'IN_PROGRESS';
+        $this->uploadedFile->save();
+
+        $result_file = new UploadedFileResult();
+        $result_file->uploaded_file_id = $this->uploadedFile->id;
+
         //Buscar fichero en el storage
         $file_path = $this->uploadedFile->full_path;
-        Log::debug($file_path);
-
-        $exists = Storage::disk('sftp')->exists($file_path);
-        if (Storage::disk('sftp')->exists($file_path)) 
+        $exists = Storage::exists($file_path);
+        if ($exists)
         {
             try {
-            Log::debug('File exists');
-            $file = Storage::disk('sftp')->get($file_path);
+                $file_content = Storage::get($file_path);
 
-            $file.
-            
-            //Abrir EXCEL
-         //   $spreadsheet = IOFactory::load($file);
-            
-         ///   print_r($spreadsheet);
+                $temp_file = tmpfile();
+                fwrite($temp_file, $file_content);
+                $file = stream_get_meta_data($temp_file)['uri']; 
+        
+                //Abrimos el excel
+                $spreadsheet = IOFactory::load($file);
+                $sheet = $spreadsheet->getSheet(0);
+                $data = $sheet->toArray(null, true, false, false);
+                fclose($temp_file);
 
-            //DETERMINAR FORMAT
-            //PROCESAR FILAS
-            
-            //Modificar el registro
-           // $uploadedFile->status = 'FINISHED';
-           // $uploadedFile->save();
-           $this->fail();
-        } catch (Exception $e) {
-            echo 'Excepción capturada: ',  $e->getMessage(), "\n";
-            Log::debug($e->getMessage());
-            $this->fail($e);
+                //Procesar filas
+                $format = $this->proces_excel($data, $result_file);
+                $this->uploadedFile->file_format = $format;
+
+            } catch (Exception $e) {
+                Log::debug($e->getMessage());
+                //Añadimos error al resultado
+                $result_file->addResult(array("ERROR", 'No se ha podido procesar el fichero'));
+                $result_file->result_status = 'ERROR';
+            }
+        } else {
+            //Añadir al resultado que no se ha encontrado el fichero
+            $result_file->addResult(array("ERROR", 'No se encuentra el fichero'));
+            $result_file->result_status = 'ERROR';
         }
+        //Guardamos el resultado del proceso
+        $result_file->save();
+
+         //Modificar el registro del fichero
+        $this->uploadedFile->status = 'FINISHED';
+        $this->uploadedFile->update();
+    }
+
+    private function proces_excel(array $data, UploadedFileResult &$file_result)
+    {
+        $excelFileFormat = $this->determine_excel_format($data[0]);
+        $excelFileFormat->proces_excel(array_slice($data, 1), $file_result);
+
+        if ($file_result->result_description != null && count($file_result->result_description) > 0)
+        {
+            $with_error = array_key_exists('ERROR', $file_result->result_description);
+            $file_result->result_status = $with_error ? 'ERROR' : 'WARNING';
+        } else {
+            $file_result->result_status = 'OK';
         }
-        else {
-            Log::debug('Doesnt exists');
+
+        return $excelFileFormat->getFormat();
+    }
+
+    private function determine_excel_format(array $header) {
+        $excelFileFormat = ExelFileFormatOD::build($header);
+        if ($excelFileFormat == null) {
+            $excelFileFormat = ExelFileFormatGD::build($header);
         }
+        return $excelFileFormat;
     }
 }

@@ -71,7 +71,8 @@
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{{$curriculum->number_subjects}}</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Exportar Oferta Docente</a><br/>
+                                    <x-abutton href="{{ route('curriculumAcademicYears.export', ['export_format' => 'OD', 'academic_year_id' => $curriculum->academic_year_id, 'curriculum_id' => $curriculum->curriculum_id])}}" class="my-3">{{ __('Exportar Oferta Docente') }}</x-abutton><br/>
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Exportar Grupos</a><br/>
                                     <a href="#" class="text-indigo-600 hover:text-indigo-900">Duplicar</a>
                                 </td>
                             </tr>

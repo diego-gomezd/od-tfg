@@ -62,6 +62,7 @@
                     </div>
                     <div class="p-3 bg-white divide-y divide-gray-200">
                         <form method="POST" action="{{route('uploadedFiles.store')}}" accept-charset="UTF-8" enctype="multipart/form-data">
+                            @csrf
                             <div class="mb-2">
                                 <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" 
                                         name="excelFiles[]" multiple required />

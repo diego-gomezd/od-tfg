@@ -10,7 +10,7 @@
         <div class="flex flex-col overflow-x-auto -my-2 sm:-mx-6 lg:-mx-8">
             <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                 <div class="py-2 align-middle inline-block min-w-full">
-                    <form method="post" action="{{ route('curriculumSubjects.store') }}">
+                    <form method="post" action="{{ route('curriculumSubjects.store', ['academic_year_id' => $academic_year->id, 'curriculum_id' => $curriculum->id]) }}">
                         @csrf
                         <div class="shadow sm:rounded-md sm:overflow-hidden">
                             <div class="px-4 py-5 bg-white space-y-6 sm:p-6">

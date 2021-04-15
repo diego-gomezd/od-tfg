@@ -23,6 +23,7 @@
         "tailwindcss": "^2.0.2"
     },
     "dependencies": {
+        "bootstrap-select": "^1.13.18",
         "jquery": "^3.6.0"
     }
 }

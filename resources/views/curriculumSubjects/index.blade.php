@@ -26,7 +26,7 @@
                                         <x-input id="filter_name" type="text" name="filter_name" placeholder="Nombre de asignatura" :value="$filter_name" />
                                     </div>
                                 </div>
-                                <div class="px-6 py-3 text-left text-md col-span-2">
+                                <div class="px-3 py-3 text-left text-md col-span-2">
                                     <div class="mt-1 flex rounded-md shadow-sm">
                                         <x-select id="filter_department_id" name="filter_department_id">
                                             <option value="" >Departamento</option>
@@ -36,37 +36,28 @@
                                         </x-select>
                                     </div>
                                 </div>
-                                <div class="px-6 py-3 text-left text-md">
+                                <div class="px-3 py-3 text-left text-md">
                                     <div class="mt-1 flex rounded-md shadow-sm">
-                                        <x-select id="filter_course" name="filter_course">
-                                            <option value="" >Curso</option>
-                                            @foreach ($courses as $course)
-                                            <option value="{{ $course }}" {{ ($course == $filter_course) ? 'selected' : '' }} > {{ $course }}</option>
-                                            @endforeach  
-                                        </x-select>
+                                        <x-combo-component name="filter_course" :options="$courses" :selectedValue="$filter_course">
+                                            <option value="">Curso</option>
+                                        </x-combo-component>
                                     </div>
                                 </div>
-                                <div class="px-6 py-3 text-left text-md">
+                                <div class="px-3 py-3 text-left text-md">
                                     <div class="mt-1 flex rounded-md shadow-sm">
-                                        <x-select id="filter_duration" name="filter_duration">
-                                            <option value="" >Cuatrimestre</option>
-                                            @foreach ($durations as $duration)
-                                            <option value="{{ $duration }}" {{ ($duration == $filter_duration) ? 'selected' : '' }} > {{ $duration }}</option>
-                                            @endforeach  
-                                        </x-select>
+                                        <x-combo-component name="filter_duration" :options="$durations" :selectedValue="$filter_duration">
+                                            <option value="">Cuatrimestre</option>
+                                        </x-combo-component>
                                     </div>
                                 </div>
-                                <div class="px-6 py-3 text-left text-md">
+                                <div class="px-3 py-3 text-left text-md">
                                     <div class="mt-1 flex rounded-md shadow-sm">
-                                        <x-select id="filter_type" name="filter_type">
-                                            <option value="" >Tipo</option>
-                                            @foreach ($types as $type)
-                                            <option value="{{ $type }}" {{ ($type == $filter_type) ? 'selected' : '' }} > {{ $type }}</option>
-                                            @endforeach  
-                                        </x-select>
+                                        <x-combo-component name="filter_type" :options="$types" :selectedValue="$filter_type">
+                                            <option value="">Tipo</option>
+                                        </x-combo-component>
                                     </div>
                                 </div>
-                                <div class="px-6 py-3 text-right text-md">
+                                <div class="px-3 py-3 text-right text-md">
                                     <x-button>{{ __('Filtrar') }}</x-button>
                                 </div>
                             </div>
@@ -79,9 +70,9 @@
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Asignatura</th>
                                 <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Departamento</th>
-                                <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Curso</th>
-                                <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Cuatrimestre</th>
-                                <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Tipo</th>
+                                <th scope="col" class="px-6 py-3 text-center text-md font-bold text-gray-600 uppercase tracking-wider">Curso</th>
+                                <th scope="col" class="px-6 py-3 text-center text-md font-bold text-gray-600 uppercase tracking-wider">Cuatrimestre</th>
+                                <th scope="col" class="px-6 py-3 text-center text-md font-bold text-gray-600 uppercase tracking-wider">Tipo</th>
                                 <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider"></th>
                             </tr>
                         </thead>
@@ -96,17 +87,17 @@
                                     <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->subject->department->name}}</div>
                                     <div class="text-sm font-medium text-gray-500">Código: {{$curriculumSubject->subject->department->code}}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->course}}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->duration}}</div>   
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->durationTitle()}}</div>   
                                   </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                   <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->type}}</div>   
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
+                                   <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->typeTitle()}}</div>   
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Editar</a> / 
+                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <x-abutton href="{{ route('curriculumSubjects.edit', $curriculumSubject->id)}}" class="my-3">{{ __('Editar') }}</x-abutton><br/>
                                     <form action="{{ route('curriculumSubjects.destroy', $curriculumSubject->id)}}" method="post">
                                     @method('DELETE')
                                     @csrf

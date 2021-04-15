@@ -41,10 +41,12 @@ Route::resource('subjects', SubjectController::class)->middleware(['auth']);
 
 Route::post('subjects/filter', [SubjectController::class, 'filter'])->middleware(['auth'])->name('subjects.filter');
 Route::post('curriculumAcademicYears/filter', [CurriculumAcademicYearController::class, 'filter'])->middleware(['auth'])->name('curriculumAcademicYears.filter');
+Route::get('curriculumAcademicYears/export', [CurriculumAcademicYearController::class, 'export'])->middleware(['auth'])->name('curriculumAcademicYears.export');
 
 Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}', [CurriculumSubjectController::class, 'index'])->middleware(['auth'])->name('curriculumSubjects.index');
 Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}/create', [CurriculumSubjectController::class, 'create'])->middleware(['auth'])->name('curriculumSubjects.create');
 Route::post('curriculumSubjects/{academic_year_id}/{curriculum_id}/filter', [CurriculumSubjectController::class, 'filter'])->middleware(['auth'])->name('curriculumSubjects.filter');
+
 
 Route::get('dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
