@@ -3,14 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Curriculum;
-use App\Models\Department;
 use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use App\Models\CurriculumSubject;
 use Illuminate\Routing\Controller;
 use App\Models\CurriculumAcademicYear;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\ExcelFileHandler\ExelFileFormatGD;
 use App\ExcelFileHandler\ExelFileFormatOD;
 use App\Models\CurriculumClassroomGroup;
@@ -48,7 +45,6 @@ class CurriculumAcademicYearController extends Controller
             'curriculums' => Curriculum::all(['id', 'name'])->sortBy('name'),
         ]);
     }
-
 
     public function export(Request $request) {
         $format = $request->export_format;

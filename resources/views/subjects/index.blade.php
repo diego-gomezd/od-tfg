@@ -55,7 +55,7 @@
                             @foreach ($subjects as $subject)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{Str::limit($subject->name, 50)}}</div>
+                                    <div class="text-sm font-medium text-gray-900">{{Str::limit($subject->name, 20)}}</div>
                                     <div class="text-sm font-medium text-gray-500">Código: {{$subject->code}}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">

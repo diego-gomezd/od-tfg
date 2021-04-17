@@ -43,7 +43,16 @@ class ExcelFileFormat {
         }
         return $validate;
     }
-    
+    /**
+     * @param $value Valor de la columna
+     * @param $header_name Nombre de la columna
+     * @param $row_num Posicion de la fila
+     * @param $mandatory Indica si el campo es obligatorio
+     * @param $warning_empty Indica si el campo puede ser vacio pero se muestra una incidencia
+     * @param $max_lenght Longitud máxima
+     * @param $only_integer Si el campo solo puede ser un numero
+     * @param &$status array con los errores de validacion
+     */
     protected function validateColumn($value, $header_name, $row_num, $mandatory, $warning_empty, $max_lenght, $only_integer, &$status)
     {
         $validate = true;
@@ -51,8 +60,9 @@ class ExcelFileFormat {
             $validate = $this->validateEmptyColumn($value, $mandatory, 'Columna '.$header_name.' vacia en fila '.$row_num, $status);
         }
 
-        if ($only_integer && !(is_numeric($value) && ctype_digit($value) && intval($value) > 0))
+        if (!empty($value) && $only_integer && !(is_numeric($value) && ctype_digit($value) && intval($value) > 0))
         {
+
             $status[] = array('status' => 'ERROR', 'msg' => 'El valor de la celda ['.$row_num.', '.$header_name.'] debe ser un número entero.');
             $validate = false; 
         }

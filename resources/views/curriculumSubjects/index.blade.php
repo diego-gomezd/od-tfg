@@ -82,7 +82,8 @@
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <a href="{{route('curriculumClassroomGroups.index', ['curriculum_subject_id' => $curriculumSubject->id])}}" 
-                                        class="text-sm font-medium text-gray-900 hover:text-indigo-600">{{$curriculumSubject->subject->name}}</a>
+                                        class="text-sm font-medium text-gray-900 hover:text-indigo-600"
+                                        title="{{$curriculumSubject->subject->name}}">{{Str::limit($curriculumSubject->subject->name, 50)}}</a>
                                     <div class="text-sm font-medium text-gray-500">Código: {{$curriculumSubject->subject->code}}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">

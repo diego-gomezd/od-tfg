@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class UploadedFile extends Model
 {
     use HasFactory;
+
+    public $uploaded_file_result;
 }

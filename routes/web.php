@@ -22,10 +22,10 @@ use App\Http\Controllers\CurriculumClassroomGroupController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::redirect('/', 'dashboard');
+Route::redirect('/', 'curriculumAcademicYears');
 
 Route::resource('uploadedFiles', UploadedFileController::class)->only([
-    'index', 'store'
+    'index', 'store', 'show'
 ])->middleware(['auth']);
 
 Route::resource('curriculumAcademicYears', CurriculumAcademicYearController::class)->only([
@@ -56,6 +56,8 @@ Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}/filter', [Curr
 Route::get('curriculumClassroomGroups/{curriculum_subject_id}', [CurriculumClassroomGroupController::class, 'index'])->middleware(['auth'])->name('curriculumClassroomGroups.index');
 Route::post('curriculumClassroomGroups/{curriculum_subject_id}', [CurriculumClassroomGroupController::class, 'update'])->middleware(['auth'])->name('curriculumClassroomGroups.update');
 
-Route::get('dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+Route::get('uploadedFiles/{uploaded_file_id}/download', [UploadedFileController::class, 'download'])->middleware(['auth'])->name('uploadedFiles.download');
+Route::get('uploadedFiles/{uploaded_file_id}/process', [UploadedFileController::class, 'process'])->middleware(['auth'])->name('uploadedFiles.process');
+
 
 require __DIR__.'/auth.php';

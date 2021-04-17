@@ -5,41 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\UploadedFile;
 use Illuminate\Http\Request;
 use App\Jobs\ProcessUploadedFile;
+use App\Models\UploadedFileResult;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UploadFilesRequest;
 
 class UploadedFileController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $excelFiles = UploadedFile::orderBy('status', 'asc')->orderBy('created_at', 'desc')->paginate(10);
+
+        foreach ($excelFiles as $file) {
+            $file->uploaded_file_result = UploadedFileResult::where('uploaded_file_id', $file->id)->orderBy('id', 'desc')->first();
+        }
 
         return view('uploadedFiles.index', [
             'excelFiles' => $excelFiles
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\UploadFilesRequest  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(UploadFilesRequest $request)
     {
         foreach ($request->file("excelFiles") as $excelFile) {
@@ -56,57 +41,40 @@ class UploadedFileController extends Controller
                 
                 //Lanzar tarea para procesarlo
                 ProcessUploadedFile::dispatch($uploadedFile);
-              //  ProcessUploadedFile::dispatchAfterResponse($uploadedFile);
             }
         }
-        return redirect()->route('uploadedFiles.index')->with('success', 'Fichero(s) almacenado. Se procesaran automáticamente');
+        return redirect()->route('uploadedFiles.index')->with('success', 'Fichero(s) almacenado(s). Se procesaran automáticamente');
     }
 
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\UploadedFile  $uploadedFile
-     * @return \Illuminate\Http\Response
-     */
     public function show(UploadedFile $uploadedFile)
     {
-        //
+        $uploadedFileResult = UploadedFileResult::where('uploaded_file_id', $uploadedFile->id)->orderBy('id', 'desc')->first();
+        
+        return view('uploadedFiles.show', [
+            'uploadedFile' => $uploadedFile,
+            'uploadedFileResult' => $uploadedFileResult,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\UploadedFile  $uploadedFile
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(UploadedFile $uploadedFile)
+    public function download(Request $request)
     {
-        //
+        $uploadedFile = UploadedFile::find($request->uploaded_file_id);
+
+        //Buscar fichero en el storage
+        $file_path = $uploadedFile->full_path;
+        $exists = Storage::exists($file_path);
+        if ($exists) {
+            return Storage::download($file_path, $uploadedFile->file_name);
+        } 
+        return redirect()->route('uploadedFiles.show', ['uploadedFile' => $uploadedFile])->with('error', 'No se ha podido descargar el fichero');
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\UploadedFile  $uploadedFile
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, UploadedFile $uploadedFile)
+    public function process(Request $request)
     {
-        //
+        $uploadedFile = UploadedFile::find($request->uploaded_file_id);
+
+        ProcessUploadedFile::dispatch($uploadedFile);
+        
+        return redirect()->route('uploadedFiles.index')->with('success', 'Fichero(s) almacenado(s). Se procesaran automáticamente');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\UploadedFile  $uploadedFile
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(UploadedFile $uploadedFile)
-    {
-        //
-    }
-
-
 }

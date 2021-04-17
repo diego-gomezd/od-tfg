@@ -2,16 +2,17 @@
 
 namespace App\Jobs;
 
-use Exception;
+use Error;
 
+use Exception;
 use App\Models\UploadedFile;
 use Illuminate\Bus\Queueable;
 use App\Models\UploadedFileResult;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Queue\InteractsWithQueue;
 use App\ExcelFileHandler\ExelFileFormatGD;
 use App\ExcelFileHandler\ExelFileFormatOD;
@@ -51,15 +52,14 @@ class ProcessUploadedFile implements ShouldQueue
         //Buscar fichero en el storage
         $file_path = $this->uploadedFile->full_path;
         $exists = Storage::exists($file_path);
-        if ($exists)
-        {
+        if ($exists) {
             try {
                 $file_content = Storage::get($file_path);
 
                 $temp_file = tmpfile();
                 fwrite($temp_file, $file_content);
-                $file = stream_get_meta_data($temp_file)['uri']; 
-        
+                $file = stream_get_meta_data($temp_file)['uri'];
+
                 //Abrimos el excel
                 $spreadsheet = IOFactory::load($file);
                 $sheet = $spreadsheet->getSheet(0);
@@ -69,22 +69,26 @@ class ProcessUploadedFile implements ShouldQueue
                 //Procesar filas
                 $format = $this->proces_excel($data, $result_file);
                 $this->uploadedFile->file_format = $format;
-
             } catch (Exception $e) {
                 Log::debug($e->getMessage());
                 //Añadimos error al resultado
-                $result_file->addResult(array("ERROR", 'No se ha podido procesar el fichero'));
+                $result_file->addResult(array('status' => 'ERROR', 'msg' => 'No se ha podido procesar el fichero'));
+                $result_file->result_status = 'ERROR';
+            } catch (Error $e) {
+                Log::debug($e->getMessage());
+                //Añadimos error al resultado
+                $result_file->addResult(array('status' => 'ERROR', 'msg' => 'No se ha podido procesar el fichero'));
                 $result_file->result_status = 'ERROR';
             }
         } else {
             //Añadir al resultado que no se ha encontrado el fichero
-            $result_file->addResult(array("ERROR", 'No se encuentra el fichero'));
+            $result_file->addResult(array('status' => 'ERROR', 'msg' => 'No se encuentra el fichero'));
             $result_file->result_status = 'ERROR';
         }
         //Guardamos el resultado del proceso
         $result_file->save();
 
-         //Modificar el registro del fichero
+        //Modificar el registro del fichero
         $this->uploadedFile->status = 'FINISHED';
         $this->uploadedFile->update();
     }
@@ -92,20 +96,31 @@ class ProcessUploadedFile implements ShouldQueue
     private function proces_excel(array $data, UploadedFileResult &$file_result)
     {
         $excelFileFormat = $this->determine_excel_format($data[0]);
-        $excelFileFormat->proces_excel(array_slice($data, 1), $file_result);
+        if ($excelFileFormat != null) {
+            $excelFileFormat->proces_excel(array_slice($data, 1), $file_result);
 
-        if ($file_result->result_description != null && count($file_result->result_description) > 0)
-        {
-            $with_error = array_key_exists('ERROR', $file_result->result_description);
-            $file_result->result_status = $with_error ? 'ERROR' : 'WARNING';
+            if ($file_result->result_description != null && count($file_result->result_description) > 0) {
+                $with_error = false;
+                foreach ($file_result->result_description as $description) {
+                    $with_error = $description['status'] == 'ERROR';
+                    if ($with_error) {
+                        break;
+                    }
+                }
+                $file_result->result_status = $with_error ? 'ERROR' : 'WARNING';
+            } else {
+                $file_result->result_status = 'OK';
+            }
         } else {
-            $file_result->result_status = 'OK';
+            $file_result->addResult(array('status' => 'ERROR', 'msg' => 'Formato de fichero excel desconocido'));
+            $file_result->result_status = 'ERROR';
         }
 
-        return $excelFileFormat->getFormat();
+        return $excelFileFormat != null ? $excelFileFormat->getFormat() : null;
     }
 
-    private function determine_excel_format(array $header) {
+    private function determine_excel_format(array $header)
+    {
         $excelFileFormat = ExelFileFormatOD::build($header);
         if ($excelFileFormat == null) {
             $excelFileFormat = ExelFileFormatGD::build($header);

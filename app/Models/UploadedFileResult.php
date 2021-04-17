@@ -26,4 +26,17 @@ class UploadedFileResult extends Model
         }
         $this->result_description = array_merge($this->result_description, $row);
     }
+
+    public function array_descriptions() {
+        $array = null;
+        if ($this->result_description != null && !empty($this->result_description)) {
+            if (array_key_exists('status', $this->result_description)) {
+                $array = array();
+                $array[] = $this->result_description;
+            } else {
+                $array = $this->result_description; 
+            }
+        }
+        return $array;
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use App\Models\UploadedFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class GetAllFilesProcessed
 {
@@ -17,14 +18,14 @@ class GetAllFilesProcessed
      */
     public function handle(Request $request, Closure $next)
     {
+     
         $response = $next($request);
         $fileInProgress = UploadedFile::where('status', 'IN_PROGRESS')->first();
         
         if ($fileInProgress != null) {
-            $num = UploadedFile::where('status', 'UPLOADED')->count();
+            $num = UploadedFile::whereIn('status', ['UPLOADED', 'IN_PROGRESS'])->count();
+            $request->session()->flash('file_status', ['message' => 'Se procesando el  fichero '.$fileInProgress->file_name.'...', 'pending' => $num]); 
         }
-        $request->session()->flash('file_status', ['message' => 'Se estan procesando ficheros...', 'pending' => 15]); 
-   
         return $response;
     }
 }

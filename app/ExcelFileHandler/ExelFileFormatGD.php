@@ -39,7 +39,7 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat {
         return self::GD_FORMAT['name'];
     }
 
-    public static function build(array $header) : IExcelFileFormat {
+    public static function build(array $header) : ?IExcelFileFormat {
         $excelFileFormat = null;
         if (self::isValidExcelFormat($header, self::COLUMNS_FORMAT)) {
             $excelFileFormat = new self();
@@ -83,7 +83,7 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat {
         }
 
         $classroom_name = $row[5];
-        if (!$this->validateColumn($classroom_name, self::COLUMNS_FORMAT[5], $row_num, false, true, 45, null, $status))
+        if (!$this->validateColumn($classroom_name, self::COLUMNS_FORMAT[5], $row_num, false, true, 200, null, $status))
         {
             $with_error = true;
         }
@@ -101,7 +101,7 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat {
         }
 
         $classroom_language = $row[8];
-        if (!$this->validateColumn($classroom_language, self::COLUMNS_FORMAT[8], $row_num, false, true, 5, null, $status))
+        if (!$this->validateColumn($classroom_language, self::COLUMNS_FORMAT[8], $row_num, false, false, 5, null, $status))
         {
             $with_error = true;
         }
@@ -113,13 +113,13 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat {
         }
 
         $classroom_capacity = $row[10];
-        if (!$this->validateColumn($classroom_capacity, self::COLUMNS_FORMAT[10], $row_num, false, true, null, true, $status))
+        if (!$this->validateColumn($classroom_capacity, self::COLUMNS_FORMAT[10], $row_num, false, false, null, true, $status))
         {
             $with_error = true;
         }
 
         $classroom_capacity_left = $row[11];
-        if (!$this->validateColumn($classroom_capacity_left, self::COLUMNS_FORMAT[11], $row_num, false, true, null, true, $status))
+        if (!$this->validateColumn($classroom_capacity_left, self::COLUMNS_FORMAT[11], $row_num, false, false, null, true, $status))
         {
             $with_error = true;
         }

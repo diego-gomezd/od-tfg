@@ -36,7 +36,7 @@ class ExelFileFormatOD extends ExcelFileFormat implements IExcelFileFormat {
         return self::OD_FORMAT['name'];
     }
 
-    public static function build(array $header) : IExcelFileFormat {
+    public static function build(array $header) : ?IExcelFileFormat {
         $excelFileFormat = null;
         if (self::isValidExcelFormat($header, self::COLUMNS_FORMAT)) {
             $excelFileFormat = new self();
