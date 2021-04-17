@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use App\Models\CurriculumClassroomGroup;
 use App\ExcelFileHandler\ExcelFileFormat;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\ExcelFileHandler\IExcelFileFormat;
 
 class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat {
@@ -167,5 +169,46 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat {
             }
         }
         return $status;
+    }
+
+    public function generateExcelFile($academic_year, $curriculum, $groups, $file_path) {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $i = 1;
+        $sheet->setCellValue('A'.strval($i), self::COLUMNS_FORMAT[0]);
+        $sheet->setCellValue('B'.strval($i), self::COLUMNS_FORMAT[1]);
+        $sheet->setCellValue('C'.strval($i), self::COLUMNS_FORMAT[2]);
+        $sheet->setCellValue('D'.strval($i), self::COLUMNS_FORMAT[3]);
+        $sheet->setCellValue('E'.strval($i), self::COLUMNS_FORMAT[4]);
+        $sheet->setCellValue('F'.strval($i), self::COLUMNS_FORMAT[5]);
+        $sheet->setCellValue('G'.strval($i), self::COLUMNS_FORMAT[6]);
+        $sheet->setCellValue('H'.strval($i), self::COLUMNS_FORMAT[7]);
+        $sheet->setCellValue('I'.strval($i), self::COLUMNS_FORMAT[8]);
+        $sheet->setCellValue('J'.strval($i), self::COLUMNS_FORMAT[9]);
+        $sheet->setCellValue('K'.strval($i), self::COLUMNS_FORMAT[10]);
+        $sheet->setCellValue('L'.strval($i), self::COLUMNS_FORMAT[11]);
+        $sheet->setCellValue('M'.strval($i), self::COLUMNS_FORMAT[12]);
+
+        $i++;
+        foreach ($groups as $group) {
+            $sheet->setCellValue('A'.strval($i), $academic_year->name);
+            $sheet->setCellValue('B'.strval($i), $curriculum->code);
+            $sheet->setCellValue('C'.strval($i), $curriculum->name);
+            $sheet->setCellValue('D'.strval($i), $group->classroomGroup->activity_id);
+            $sheet->setCellValue('E'.strval($i), $group->classroomGroup->activity_group);
+            $sheet->setCellValue('F'.strval($i), $group->classroomGroup->name);
+            $sheet->setCellValue('G'.strval($i), $group->classroomGroup->subject->code);
+            $sheet->setCellValue('H'.strval($i), $group->classroomGroup->subject->name);
+            $sheet->setCellValue('I'.strval($i), $group->classroomGroup->language);
+            $sheet->setCellValue('J'.strval($i), $group->classroomGroup->duration);
+            $sheet->setCellValue('K'.strval($i), $group->classroomGroup->capacity);
+            $sheet->setCellValue('L'.strval($i), $group->classroomGroup->capacity_left);
+            $sheet->setCellValue('M'.strval($i), $group->classroomGroup->comments);
+            $i++;
+        }
+        
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($file_path);
     }
 }

@@ -11,7 +11,9 @@ use Illuminate\Routing\Controller;
 use App\Models\CurriculumAcademicYear;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\ExcelFileHandler\ExelFileFormatGD;
 use App\ExcelFileHandler\ExelFileFormatOD;
+use App\Models\CurriculumClassroomGroup;
 
 class CurriculumAcademicYearController extends Controller
 {
@@ -52,15 +54,24 @@ class CurriculumAcademicYearController extends Controller
         $format = $request->export_format;
         $academic_year = AcademicYear::find($request->academic_year_id);
         $curriculum = Curriculum::find($request->curriculum_id);
-        $subjects = CurriculumSubject::where('academic_year_id', $academic_year->id)->
-            where('curriculum_id', $curriculum->id)->get();
-
+        
         $file_name = $format.'_'.$curriculum->code.'_'.$academic_year->name.'.xlsx';
         $file_path = public_path($file_name);
 
         if ($format == 'OD') {
+            $subjects = CurriculumSubject::where('academic_year_id', $academic_year->id)->where('curriculum_id', $curriculum->id)->get();
+
             $excelFileFormat = new ExelFileFormatOD();
             $excelFileFormat->generateExcelFile($academic_year, $curriculum, $subjects, $file_path);
+        } else if ($format == 'GD') {
+            $groups = CurriculumClassroomGroup::whereHas('curriculumSubject', function($q) use ($academic_year) {
+                $q->where('academic_year_id', $academic_year->id);
+            })->whereHas('curriculumSubject', function($q) use ($curriculum) {
+                $q->where('curriculum_id', $curriculum->id);
+            })->get();
+
+            $excelFileFormat = new ExelFileFormatGD();
+            $excelFileFormat->generateExcelFile($academic_year, $curriculum, $groups, $file_path);
         }
 
         return response()->download($file_path);

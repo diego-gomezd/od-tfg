@@ -67,7 +67,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <x-abutton href="{{ route('curriculumAcademicYears.export', ['export_format' => 'OD', 'academic_year_id' => $curriculum->academic_year_id, 'curriculum_id' => $curriculum->curriculum_id])}}" class="my-3">{{ __('Exportar Oferta Docente') }}</x-abutton><br/>
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Exportar Grupos</a><br/>
+                                    <x-abutton href="{{ route('curriculumAcademicYears.export', ['export_format' => 'GD', 'academic_year_id' => $curriculum->academic_year_id, 'curriculum_id' => $curriculum->curriculum_id])}}" class="my-3">{{ __('Exportar Grupos') }}</x-abutton><br/>
                                     <a href="#" class="text-indigo-600 hover:text-indigo-900">Duplicar</a>
                                 </td>
                             </tr>
