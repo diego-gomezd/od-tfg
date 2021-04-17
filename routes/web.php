@@ -7,6 +7,7 @@ use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\UploadedFileController;
+use App\Http\Controllers\ClassroomGroupController;
 use App\Http\Controllers\CurriculumSubjectController;
 use App\Http\Controllers\CurriculumAcademicYearController;
 
@@ -38,10 +39,14 @@ Route::resource('curriculums', CurriculumController::class)->middleware(['auth']
 Route::resource('academicYears', AcademicYearController::class)->middleware(['auth']);
 Route::resource('departments', DepartmentController::class)->middleware(['auth']);
 Route::resource('subjects', SubjectController::class)->middleware(['auth']);
+Route::resource('classroomGroups', ClassroomGroupController::class)->middleware(['auth']);
 
 Route::post('subjects/filter', [SubjectController::class, 'filter'])->middleware(['auth'])->name('subjects.filter');
 Route::post('curriculumAcademicYears/filter', [CurriculumAcademicYearController::class, 'filter'])->middleware(['auth'])->name('curriculumAcademicYears.filter');
+Route::post('classroomGroups/filter', [ClassroomGroupController::class, 'filter'])->middleware(['auth'])->name('classroomGroups.filter');
+
 Route::get('curriculumAcademicYears/export', [CurriculumAcademicYearController::class, 'export'])->middleware(['auth'])->name('curriculumAcademicYears.export');
+
 
 Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}', [CurriculumSubjectController::class, 'index'])->middleware(['auth'])->name('curriculumSubjects.index');
 Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}/create', [CurriculumSubjectController::class, 'create'])->middleware(['auth'])->name('curriculumSubjects.create');

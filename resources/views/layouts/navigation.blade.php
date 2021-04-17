@@ -30,6 +30,9 @@
                     <x-nav-link :href="route('departments.index')" :active="request()->routeIs('departments.*')">
                         {{ __('Departamentos') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('classroomGroups.index')" :active="request()->routeIs('classroomGroups.*')">
+                        {{ __('Grupos') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('uploadedFiles.index')" :active="request()->routeIs('uploadedFiles.*')">
                         {{ __('Ficheros subidos') }}
                     </x-nav-link>

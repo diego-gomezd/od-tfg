@@ -6,14 +6,12 @@ use App\Models\Subject;
 use App\Models\Curriculum;
 use App\Models\Department;
 use App\Models\AcademicYear;
-use App\Models\Combos\Combo;
 use Illuminate\Http\Request;
 use App\Models\Combos\Course;
 use App\Models\Combos\Duration;
 use App\Models\CurriculumSubject;
 use App\Models\Combos\SubjectType;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Log;
 use App\Models\CurriculumClassroomGroup;
 use App\Http\Requests\CurriculumSubjectRequest;
 
