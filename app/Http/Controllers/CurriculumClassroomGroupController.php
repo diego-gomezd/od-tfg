@@ -2,84 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CurriculumClassroomGroup;
 use Illuminate\Http\Request;
+use App\Models\ClassroomGroup;
+use App\Models\CurriculumSubject;
+use App\Models\CurriculumClassroomGroup;
+use App\Http\Requests\UpdateCurriculumClassroomGroupRequest;
 
 class CurriculumClassroomGroupController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $curriculumSubject = CurriculumSubject::find($request->curriculum_subject_id);
+        
+
+        $classroomGroups = ClassroomGroup::where('subject_id', $curriculumSubject->subject_id)->where('academic_year_id', $curriculumSubject->academic_year_id)->get();
+
+        foreach ($classroomGroups as $group) {
+            $cs = CurriculumClassroomGroup::where('curriculum_subject_id', $curriculumSubject->id)->where('classroom_group_id', $group->id)->first();
+            
+            $group->offered = $cs != null ? true : false;
+        }
+        return view('curriculumClassroomGroups.index', [
+            'classroomGroups' => $classroomGroups,
+            'curriculumSubject' => $curriculumSubject,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function update(UpdateCurriculumClassroomGroupRequest $request)
     {
-        //
-    }
+        $curriculumSubject = CurriculumSubject::find($request->curriculum_subject_id);
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        CurriculumClassroomGroup::where('curriculum_subject_id', $curriculumSubject->id)->delete();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\CurriculumClassroomGroup  $curriculumClassroomGroup
-     * @return \Illuminate\Http\Response
-     */
-    public function show(CurriculumClassroomGroup $curriculumClassroomGroup)
-    {
-        //
-    }
+        if ($request->classroomgroups != null) {
+            foreach ($request->classroomgroups as $classroom_group_id => $offered) {
+                $curriculumClassroomGroup = CurriculumClassroomGroup::where('curriculum_subject_id', $curriculumSubject->id)->where('classroom_group_id', $classroom_group_id)->first();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\CurriculumClassroomGroup  $curriculumClassroomGroup
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CurriculumClassroomGroup $curriculumClassroomGroup)
-    {
-        //
-    }
+                if ($offered == true && $curriculumClassroomGroup == null) {
+                    $curriculumClassroomGroup = new CurriculumClassroomGroup();
+                    $curriculumClassroomGroup->classroom_group_id = $classroom_group_id;
+                    $curriculumClassroomGroup->curriculum_subject_id = $curriculumSubject->id;
+                    $curriculumClassroomGroup->save();
+                    
+                } else if ($offered == false && $curriculumClassroomGroup != null) {
+                    $curriculumClassroomGroup->delete();
+                }
+            }
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CurriculumClassroomGroup  $curriculumClassroomGroup
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, CurriculumClassroomGroup $curriculumClassroomGroup)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\CurriculumClassroomGroup  $curriculumClassroomGroup
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(CurriculumClassroomGroup $curriculumClassroomGroup)
-    {
-        //
+        return redirect()->route('curriculumClassroomGroups.index', [
+            'curriculum_subject_id' => $request->curriculum_subject_id,
+        ])->with('success', 'Lista de grupos actualizada');
     }
 }

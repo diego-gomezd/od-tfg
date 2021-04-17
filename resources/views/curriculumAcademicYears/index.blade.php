@@ -9,11 +9,6 @@
         <div class="flex flex-col overflow-x-auto -my-2 sm:-mx-6 lg:-mx-8">
             <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                 <div class="py-2 align-middle inline-block min-w-full">
-                    <div class="float-right">
-                        <x-abutton href="{{ route('subjects.create')}}">{{ __('Crear Oferta docente') }}</x-abutton>
-                    </div>
-                </div>
-                <div class="py-2 align-middle inline-block min-w-full">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                         <div class="bg-gray-50 px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Filtrar</div>
                             <form method="post" action="{{ route('curriculumAcademicYears.filter') }}" >

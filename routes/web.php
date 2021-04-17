@@ -10,6 +10,7 @@ use App\Http\Controllers\UploadedFileController;
 use App\Http\Controllers\ClassroomGroupController;
 use App\Http\Controllers\CurriculumSubjectController;
 use App\Http\Controllers\CurriculumAcademicYearController;
+use App\Http\Controllers\CurriculumClassroomGroupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,11 +48,13 @@ Route::post('classroomGroups/filter', [ClassroomGroupController::class, 'filter'
 
 Route::get('curriculumAcademicYears/export', [CurriculumAcademicYearController::class, 'export'])->middleware(['auth'])->name('curriculumAcademicYears.export');
 
-
 Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}', [CurriculumSubjectController::class, 'index'])->middleware(['auth'])->name('curriculumSubjects.index');
 Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}/create', [CurriculumSubjectController::class, 'create'])->middleware(['auth'])->name('curriculumSubjects.create');
 Route::post('curriculumSubjects/{academic_year_id}/{curriculum_id}/filter', [CurriculumSubjectController::class, 'filter'])->middleware(['auth'])->name('curriculumSubjects.filter');
+Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}/filter', [CurriculumSubjectController::class, 'filter'])->middleware(['auth'])->name('curriculumSubjects.filter');
 
+Route::get('curriculumClassroomGroups/{curriculum_subject_id}', [CurriculumClassroomGroupController::class, 'index'])->middleware(['auth'])->name('curriculumClassroomGroups.index');
+Route::post('curriculumClassroomGroups/{curriculum_subject_id}', [CurriculumClassroomGroupController::class, 'update'])->middleware(['auth'])->name('curriculumClassroomGroups.update');
 
 Route::get('dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 

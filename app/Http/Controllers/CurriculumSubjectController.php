@@ -46,12 +46,16 @@ class CurriculumSubjectController extends Controller
     private function filterSubjects($academic_year_id, $curriculum_id, $filter_name, $filter_department_id, $filter_course, $filter_duration, $filter_type)
     {
         $query = CurriculumSubject::where('academic_year_id', $academic_year_id)->where('curriculum_id', $curriculum_id);
-        $query->join('subjects', 'subjects.id', '=', 'curriculum_subjects.subject_id');
+        
         if (!empty($filter_name)) {
-            $query->where('subjects.name', 'LIKE', '%'.strtoupper($filter_name).'%');
+            $query->whereHas('subject', function($q) use ($filter_name) {
+                $q->where('name', 'LIKE', '%'.strtoupper($filter_name).'%');
+            });
         }
         if (!empty($filter_department_id)) {
-            $query->where('subjects.department_id', $filter_department_id);
+             $query->whereHas('subject', function($q) use ($filter_department_id) {
+                $q->where('department_id', $filter_department_id);
+            });
         }
         if (!empty($filter_course)) {
             $query->where('course', $filter_course);
@@ -63,6 +67,10 @@ class CurriculumSubjectController extends Controller
             $query->where('type', $filter_type);
         }
         $curriculumSubjects = $query->orderBy('course', 'asc')->orderBy('duration', 'asc')->paginate(10)->withQueryString();
+
+        foreach ($curriculumSubjects as $curriculum_subject) {
+            $curriculum_subject->num_groups = CurriculumClassroomGroup::where('curriculum_subject_id', $curriculum_subject->id)->count();
+        }
             
         $curriculum = Curriculum::find($curriculum_id);
         $academic_year = AcademicYear::find($academic_year_id);

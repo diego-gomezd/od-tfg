@@ -12,6 +12,7 @@ class ClassroomGroup extends Model
 
     protected $fillable = ['academic_year_id', 'subject_id', 'name', 'activity_id', 'activity_group', 'duration', 'language', 'capacity', 'capacity_left', 'location'];
 
+    public $offered;
 
     public function academicYear()
     {

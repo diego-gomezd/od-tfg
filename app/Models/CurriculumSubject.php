@@ -18,6 +18,7 @@ class CurriculumSubject extends Model
 
     protected $fillable = ['academic_year_id', 'curriculum_id', 'subject_id', 'type', 'duration', 'course', 'part_time_course', 'comments'];
 
+    public $num_groups;
 
     public function academicYear()
     {

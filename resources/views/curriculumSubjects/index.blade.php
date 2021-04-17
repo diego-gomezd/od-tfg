@@ -73,14 +73,16 @@
                                 <th scope="col" class="px-6 py-3 text-center text-md font-bold text-gray-600 uppercase tracking-wider">Curso</th>
                                 <th scope="col" class="px-6 py-3 text-center text-md font-bold text-gray-600 uppercase tracking-wider">Cuatrimestre</th>
                                 <th scope="col" class="px-6 py-3 text-center text-md font-bold text-gray-600 uppercase tracking-wider">Tipo</th>
-                                <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider"></th>
+                                <th scope="col" class="px-6 py-3 text-center text-md font-bold text-gray-600 uppercase tracking-wider">Grupos</th>
+                                <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @foreach ($curriculumSubjects as $curriculumSubject)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->subject->name}}</div>
+                                    <a href="{{route('curriculumClassroomGroups.index', ['curriculum_subject_id' => $curriculumSubject->id])}}" 
+                                        class="text-sm font-medium text-gray-900 hover:text-indigo-600">{{$curriculumSubject->subject->name}}</a>
                                     <div class="text-sm font-medium text-gray-500">Código: {{$curriculumSubject->subject->code}}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -95,6 +97,10 @@
                                   </td>
                                 <td class="px-6 py-4 text-center whitespace-nowrap">
                                    <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->typeTitle()}}</div>   
+                                </td>
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
+                                <a href="{{route('curriculumClassroomGroups.index', ['curriculum_subject_id' => $curriculumSubject->id])}}" 
+                                    class="text-sm font-medium text-gray-900 hover:text-indigo-600">{{$curriculumSubject->num_groups}}</a>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right">
                                     <x-abutton href="{{ route('curriculumSubjects.edit', $curriculumSubject->id)}}" class="my-3">{{ __('Editar') }}</x-abutton><br/>

@@ -70,7 +70,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Ubicación</th>
                                 <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Cuatrimestre</th>
                                 <th scope="col" class="px-6 py-3 text-left text-md font-bold text-gray-600 uppercase tracking-wider">Grupo</th>
-                                <th scope="col" class="px-6 py-3 text-center text-md font-bold text-gray-600 uppercase tracking-wider">Plazas disponibles</th>
+                                <th scope="col" class="px-6 py-3 text-center text-md font-bold text-gray-600 uppercase tracking-wider">Plazas ocupadas</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -92,17 +92,18 @@
 
                                 <td class="px-6 py-4 text-center whitespace-nowrap">
                                     @if ($classroomgroup->capacity != null && $classroomgroup->capacity > 0)
-                                    @if ($classroomgroup->isCapacityRemainingMoreThan(99))
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
 
-                                    @elseif ($classroomgroup->isCapacityRemainingMoreThan(75))
+                                    @if ($classroomgroup->isCapacityRemainingMoreThan(50))
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+
+                                    @elseif ($classroomgroup->isCapacityRemainingMoreThan(10))
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
 
-                                    @else ($classroomgroup->isCapacityRemainingMoreThan(75))
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    @else
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                     
                                     @endif
-                                    {{$classroomgroup->capacity-$classroomgroup->capacity_left}} / {{$classroomgroup->capacity}} </span>
+                                    {{$classroomgroup->capacity_left}} / {{$classroomgroup->capacity}} </span>
                                     @endif
                                 </td>
 
