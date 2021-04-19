@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Queue\InteractsWithQueue;
 use App\ExcelFileHandler\ExelFileFormatGD;
+use App\ExcelFileHandler\ExelFileFormatGTeleco;
 use App\ExcelFileHandler\ExelFileFormatOD;
+use App\ExcelFileHandler\ExelFileFormatOTrans;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
@@ -95,7 +97,22 @@ class ProcessUploadedFile implements ShouldQueue
 
     private function proces_excel(array $data, UploadedFileResult &$file_result)
     {
-        $excelFileFormat = $this->determine_excel_format($data[0]);
+        $excelFileFormat = null;
+        if ($file_result->uploadedFile->file_format != null) {
+            $format = $file_result->uploadedFile->file_format;
+            var_dump($format);
+            if ($format == 'OD') {
+                $excelFileFormat = new ExelFileFormatOD();
+            } else if ($format == 'GD') {
+                $excelFileFormat = new ExelFileFormatGD();
+            } else if ($format == 'GTeleco') {
+                $excelFileFormat = new ExelFileFormatGTeleco();
+            } else if ($format == 'OTrans') {
+                $excelFileFormat = new ExelFileFormatOTrans();
+            }
+        } else {
+            $excelFileFormat = $this->determine_excel_format($data[0]);
+        }
         if ($excelFileFormat != null) {
             $excelFileFormat->proces_excel(array_slice($data, 1), $file_result);
 
@@ -124,6 +141,12 @@ class ProcessUploadedFile implements ShouldQueue
         $excelFileFormat = ExelFileFormatOD::build($header);
         if ($excelFileFormat == null) {
             $excelFileFormat = ExelFileFormatGD::build($header);
+        }
+        if ($excelFileFormat == null) {
+            $excelFileFormat = ExelFileFormatGTeleco::build($header);
+        }
+        if ($excelFileFormat == null) {
+            $excelFileFormat = ExelFileFormatOTrans::build($header);
         }
         return $excelFileFormat;
     }

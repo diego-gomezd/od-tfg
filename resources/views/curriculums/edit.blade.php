@@ -1,3 +1,4 @@
+@section('title', 'Editar '.$curriculum->code)
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -17,8 +18,8 @@
                                 <x-curriculum-component :curriculum="$curriculum" />
                             </div>
                             <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                            <x-button>{{ __('Actualizar') }}</x-buton>
-                            <x-abutton href="{{ route('curriculums.index')}}">{{ __('Cancelar') }}</x-abutton>
+                                <x-button>{{ __('Actualizar') }}</x-buton>
+                                    <x-abutton href="{{ route('curriculums.index')}}">{{ __('Cancelar') }}</x-abutton>
                             </div>
                         </div>
                     </form>

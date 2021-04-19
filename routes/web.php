@@ -22,6 +22,7 @@ use App\Http\Controllers\CurriculumClassroomGroupController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::redirect('/', 'curriculumAcademicYears');
 
 Route::resource('uploadedFiles', UploadedFileController::class)->only([
@@ -43,10 +44,12 @@ Route::resource('subjects', SubjectController::class)->middleware(['auth']);
 Route::resource('classroomGroups', ClassroomGroupController::class)->middleware(['auth']);
 
 Route::post('subjects/filter', [SubjectController::class, 'filter'])->middleware(['auth'])->name('subjects.filter');
-Route::post('curriculumAcademicYears/filter', [CurriculumAcademicYearController::class, 'filter'])->middleware(['auth'])->name('curriculumAcademicYears.filter');
 Route::post('classroomGroups/filter', [ClassroomGroupController::class, 'filter'])->middleware(['auth'])->name('classroomGroups.filter');
 
+Route::post('curriculumAcademicYears/filter', [CurriculumAcademicYearController::class, 'filter'])->middleware(['auth'])->name('curriculumAcademicYears.filter');
 Route::get('curriculumAcademicYears/export', [CurriculumAcademicYearController::class, 'export'])->middleware(['auth'])->name('curriculumAcademicYears.export');
+Route::post('curriculumAcademicYears/duplicate', [CurriculumAcademicYearController::class, 'duplicate'])->middleware(['auth'])->name('curriculumAcademicYears.duplicate');
+
 
 Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}', [CurriculumSubjectController::class, 'index'])->middleware(['auth'])->name('curriculumSubjects.index');
 Route::get('curriculumSubjects/{academic_year_id}/{curriculum_id}/create', [CurriculumSubjectController::class, 'create'])->middleware(['auth'])->name('curriculumSubjects.create');
@@ -60,4 +63,4 @@ Route::get('uploadedFiles/{uploaded_file_id}/download', [UploadedFileController:
 Route::get('uploadedFiles/{uploaded_file_id}/process', [UploadedFileController::class, 'process'])->middleware(['auth'])->name('uploadedFiles.process');
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -31,7 +31,7 @@ class CurriculumController extends Controller
         $curriculum->name = $request->input('name');
         $curriculum->save();
 
-        return redirect()->route('curriculums.index')->with('success', 'Plan de Estudios \''.$curriculum->name.'\'insertado.');
+        return redirect()->route('curriculums.index')->with('success', 'Plan de Estudios \'' . $curriculum->name . '\'insertado.');
     }
 
 
@@ -54,26 +54,24 @@ class CurriculumController extends Controller
         $curriculum->code = $request->input('code');
         $curriculum->name = $request->input('name');
 
-        if (Curriculum::where('id', '!=', $curriculum->id)->where(function($query) use ($request) {
-                $query->orWhere('name', $request->input('name'))
-                      ->orWhere('code', $request->input('code'));
-            })->first() == null)
-        {
+        if (Curriculum::where('id', '!=', $curriculum->id)->where(function ($query) use ($request) {
+            $query->orWhere('name', $request->input('name'))
+                ->orWhere('code', $request->input('code'));
+        })->first() == null) {
             $curriculum->update();
             return redirect()->route('curriculums.index')->with('success', 'Plan de Estudios actualizado.');
         }
-        $request->session()->flash('warning','Ya existe un Plan de Estudios con ese nombre o código.'); 
+        $request->session()->flash('warning', 'Ya existe un Plan de Estudios con ese nombre o código.');
         return view('curriculums.edit', ['curriculum' => $curriculum]);
     }
 
     public function destroy(Curriculum $curriculum)
     {
         $count = CurriculumSubject::where('curriculum_id', $curriculum->id)->count();
-        if ($count == 0)
-        {
+        if ($count == 0) {
             $curriculum->delete();
-            return redirect()->route('curriculums.index')->with('success', 'Plan de Estudios \''.$curriculum->name.'\' eliminado.');
+            return redirect()->route('curriculums.index')->with('success', 'Plan de Estudios \'' . $curriculum->name . '\' eliminado.');
         }
-        return redirect()->route('curriculums.index')->with('error', 'No se puede eliminar el Plan de Estudios '.$curriculum->name.' porque hay Ofertas Docentes que lo incluyen.');
+        return redirect()->route('curriculums.index')->with('error', 'No se puede eliminar el Plan de Estudios ' . $curriculum->name . ' porque hay Ofertas Docentes que lo incluyen.');
     }
 }

@@ -1,3 +1,4 @@
+@section('title', 'Resultado fichero '.$uploadedFile->file_name)
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight"><a href="{{ route('uploadedFiles.index') }}">{{ __('Importaciones') }}</a> > {{$uploadedFile->file_name}}</h2>

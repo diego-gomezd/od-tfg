@@ -1,3 +1,4 @@
+@section('title', 'Nuevo departamento')
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -16,8 +17,8 @@
                                 <x-department-component :department="$department" />
                             </div>
                             <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                            <x-button>{{ __('Insertar') }}</x-buton>
-                            <x-abutton href="{{ route('departments.index')}}">{{ __('Cancelar') }}</x-abutton>
+                                <x-button>{{ __('Insertar') }}</x-buton>
+                                    <x-abutton href="{{ route('departments.index')}}">{{ __('Cancelar') }}</x-abutton>
                             </div>
                         </div>
                     </form>

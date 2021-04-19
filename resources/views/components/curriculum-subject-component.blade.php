@@ -35,3 +35,11 @@
         </x-combo-component>
     </div>
 </div>
+<div class="col-span-3 sm:col-span-2">
+    <x-label for="comments" :value="__('Comentarios')"/>
+    <div class="mt-1 flex rounded-md shadow-sm">
+        <x-textarea id="comments" name="comments">
+        {{$curriculumSubject->comments}}
+        </x-textarea>
+    </div>
+</div>

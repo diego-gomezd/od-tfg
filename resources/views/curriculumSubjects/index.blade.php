@@ -87,8 +87,10 @@
                                     <div class="text-sm font-medium text-gray-500">Código: {{$curriculumSubject->subject->code}}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
+                                    @if ($curriculumSubject->subject->department_id != null)
                                     <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->subject->department->name}}</div>
                                     <div class="text-sm font-medium text-gray-500">Código: {{$curriculumSubject->subject->department->code}}</div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-center whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{$curriculumSubject->course}}</div>

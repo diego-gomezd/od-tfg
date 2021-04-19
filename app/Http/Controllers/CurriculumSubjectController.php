@@ -125,6 +125,7 @@ class CurriculumSubjectController extends Controller
         $curriculumSubject->type = $request->input('type');
         $curriculumSubject->duration = $request->input('duration');
         $curriculumSubject->course = $request->input('course');
+        $curriculumSubject->comments = $request->input('comments');
 
         if (CurriculumSubject::where('academic_year_id', $curriculumSubject->academic_year_id)->
             where('curriculum_id', $curriculumSubject->curriculum_id)->
@@ -181,6 +182,7 @@ class CurriculumSubjectController extends Controller
         $curriculumSubject->type = $request->input('type');
         $curriculumSubject->duration = $request->input('duration');
         $curriculumSubject->course = $request->input('course');
+        $curriculumSubject->comments = $request->input('comments');
 
         if (CurriculumSubject::where('id', '!=', $curriculumSubject->id)->
             where('academic_year_id', $curriculumSubject->academic_year_id)->
