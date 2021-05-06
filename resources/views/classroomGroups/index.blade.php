@@ -1,11 +1,17 @@
-@section('title', 'Grupos '.$academic_year->name)
+@section('title', 'Grupos '.($academic_year != null ? $academic_year->name : ''))
 <x-app-layout>
     <x-slot name="header">
+        @if ($academic_year != null)
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Grupos') }} {{ $academic_year->name }}
         </h2>
+        @else
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            No existen cursos academicos creados.
+        </h2>
+        @endif
     </x-slot>
-
+    @if ($academic_year != null)
     <div class="max-w-8xl mx-auto py-6 sm:px-6 lg:px-8 grid">
         <div class="flex flex-col overflow-x-auto -my-2 sm:-mx-6 lg:-mx-8">
             <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -129,4 +135,5 @@
             </div>
         </div>
     </div>
+    @endif
 </x-app-layout>

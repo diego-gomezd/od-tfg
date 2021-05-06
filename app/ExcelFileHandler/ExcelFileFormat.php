@@ -25,7 +25,7 @@ class ExcelFileFormat
     {
         $validate = true;
         if (empty(trim($value))) {
-            $status[] = array('status' => $mandatory ? 'ERROR' : 'WARNING', 'msg' => $errorMsg. '(\''.$value.'\')');
+            $status[] = array('status' => $mandatory ? 'ERROR' : 'WARNING', 'msg' => $errorMsg . '(\'' . $value . '\')');
             if ($mandatory) {
                 $validate = false;
             }
@@ -37,7 +37,7 @@ class ExcelFileFormat
     {
         $validate = true;
         if (!empty(trim($value)) && strlen(trim($value)) > $max_lenght) {
-            $status[] = array('status' => 'ERROR', 'msg' => $errorMsg. '(\''.$value.'\')');
+            $status[] = array('status' => 'ERROR', 'msg' => $errorMsg . '(\'' . $value . '\')');
             $validate = false;
         }
         return $validate;
@@ -60,7 +60,7 @@ class ExcelFileFormat
         }
 
         if (!empty($value) && $only_integer && !(is_int($value) || ctype_digit($value))) {
-            $status[] = array('status' => 'ERROR', 'msg' => 'El valor de la celda [' . $row_num . ', ' . $header_name . '] debe ser un número entero. (\''.$value.'\')');
+            $status[] = array('status' => 'ERROR', 'msg' => 'El valor de la celda [' . $row_num . ', ' . $header_name . '] debe ser un número entero. (\'' . $value . '\')');
             $validate = false;
         }
 
@@ -101,11 +101,68 @@ class ExcelFileFormat
         return $course;
     }
 
+    protected function getSmallGroupFromClassgroup($group_name, $classgroup_code)
+    {
+        $small_group = false;
+
+        if ($group_name != null && str_contains(strtoupper($group_name), 'GRANDE')) {
+            $small_group = false;
+        } else if ($group_name != null && str_contains(strtoupper($group_name), 'PEQUEÑO')) {
+            $small_group = true;
+        } else if ($group_name != null && str_contains(strtoupper($group_name), 'REDUCIDO')) {
+            $small_group = true;
+        } else {
+            if (!empty($classgroup_code)) {
+                $parts = explode("_", $classgroup_code);
+                if (count($parts) == 1) {
+                    $to_parse = $parts[0];
+                    if (strlen($to_parse) == 2 && ctype_alpha($to_parse[0])) {
+                        $small_group = true;
+                    }
+                } else if (count($parts) == 2) {
+                    $to_parse = null;
+                    if ($parts[0][0] == 'G' || ctype_digit($parts[0])) {
+                        $to_parse = $parts[1];
+                    } else {
+                        $to_parse = $parts[0];
+                    }
+
+                    if ($to_parse != null) {
+                        if (strlen($to_parse) == 3) {
+                            $small_group = true;
+                        } else if (strlen($to_parse) == 2 && ctype_alpha($to_parse[0]) && ctype_digit($to_parse[1])) {
+                            $small_group = true;
+                        }
+                    }
+                } else if (count($parts) == 3) {
+                    $small_group = true;
+                }
+            }
+        }
+        return $small_group;
+    }
+
     protected const title_style = [
         'font' => [
             'bold' => true,
             'name' => 'Arial',
             'size' => 10,
+        ],
+        'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+        ],
+        'borders' => [
+            'allBorders' => [
+                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+            ],
+        ],
+    ];
+
+    protected const title_summary_style = [
+        'font' => [
+            'bold' => true,
+            'name' => 'Arial',
+            'size' => 12,
         ],
         'alignment' => [
             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
@@ -130,6 +187,26 @@ class ExcelFileFormat
             'allBorders' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
             ],
+        ],
+    ];
+
+    protected const manual_data_style = [
+        'font' => [
+            'bold' => true,
+            'name' => 'Arial',
+            'size' => 10,
+        ],
+        'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+        ],
+        'borders' => [
+            'allBorders' => [
+                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+            ],
+        ],
+        'fill' => [
+            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+            'startColor' => array('argb' => 'FFFFFF00')
         ],
     ];
 }

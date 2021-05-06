@@ -9,7 +9,7 @@ class CurriculumClassroomGroup extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['classroom_group_id', 'curriculum_subject_id'];
+    protected $fillable = ['classroom_group_id', 'curriculum_subject_id', 'creation_type'];
 
 
     public function classroomGroup()

@@ -100,6 +100,8 @@ class ExelFileFormatOTrans extends ExcelFileFormat implements IExcelFileFormat
             $with_error = true;
         }
 
+        $small_group = $this->getSmallGroupFromClassgroup($classroom_name, $classroom_code);
+
         $i = 12;
         $curriculums = array();
         while ($i < count($row) && $row[$i] != null) {
@@ -123,7 +125,8 @@ class ExelFileFormatOTrans extends ExcelFileFormat implements IExcelFileFormat
                     $classroom_capacity,
                     null,
                     $subject_duration,
-                    $location
+                    $location,
+                    $small_group
                 );
 
                 $course = $this->getCourseFromClassgroup($classroom_code);

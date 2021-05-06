@@ -11,7 +11,7 @@
                 <div class="py-2 align-middle inline-block min-w-full"> 
                     <div class="shadow sm:rounded-md sm:overflow-hidden">
                         <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
-                            <x-subject-component :subject="$subject" :departments="$departments" />
+                            <x-subject-component :subject="$subject" :departments="$departments"  />
                         </div>
                         <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
                             <x-abutton href="{{ route('subjects.edit', $subject->id)}}">{{ __('Editar') }}</x-abutton>

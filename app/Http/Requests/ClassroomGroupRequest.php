@@ -32,6 +32,7 @@ class ClassroomGroupRequest extends FormRequest
             "capacity" => "nullable|integer",
             "capacity_left" => "nullable|integer",
             "location" => "nullable|max:100",
+            "small_group" => "nullable",
         ];
 
         if ($this->getMethod() == 'POST') {

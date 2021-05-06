@@ -9,16 +9,18 @@ class ClassroomGroupComponent extends Component
     public $classroomGroup;
     public $subjects;
     public $durations;
+    public $sizeGroups;
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($classroomGroup, $subjects, $durations)
+    public function __construct($classroomGroup, $subjects, $durations, $sizeGroups)
     {
         $this->classroomGroup = $classroomGroup;
         $this->subjects = $subjects;
         $this->durations = $durations;
+        $this->sizeGroups = $sizeGroups;
     }
 
     /**

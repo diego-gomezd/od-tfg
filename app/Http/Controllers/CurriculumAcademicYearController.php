@@ -11,7 +11,9 @@ use App\Models\CurriculumAcademicYear;
 use App\ExcelFileHandler\ExelFileFormatGD;
 use App\ExcelFileHandler\ExelFileFormatOD;
 use App\Models\ClassroomGroup;
+use App\Models\Combos\CreationType;
 use App\Models\CurriculumClassroomGroup;
+use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report\Crap4j;
 
 class CurriculumAcademicYearController extends Controller
 {
@@ -55,12 +57,12 @@ class CurriculumAcademicYearController extends Controller
         $format = $request->export_format;
         $academic_year = AcademicYear::find($request->academic_year_id);
         $curriculum = Curriculum::find($request->curriculum_id);
+        $subjects = CurriculumSubject::where('academic_year_id', $academic_year->id)->where('curriculum_id', $curriculum->id)->get();
 
         $file_name = $format . '_' . $curriculum->code . '_' . $academic_year->name . '.xlsx';
         $file_path = public_path($file_name);
 
         if ($format == 'OD') {
-            $subjects = CurriculumSubject::where('academic_year_id', $academic_year->id)->where('curriculum_id', $curriculum->id)->get();
 
             $excelFileFormat = new ExelFileFormatOD();
             $excelFileFormat->generateExcelFile($academic_year, $curriculum, $subjects, $file_path);
@@ -71,8 +73,33 @@ class CurriculumAcademicYearController extends Controller
                 $q->where('curriculum_id', $curriculum->id);
             })->get();
 
+            $summary = array();
+
+
+            foreach ($subjects as $subject) {
+
+                $curriculumClassroomGroups = CurriculumClassroomGroup::where('curriculum_subject_id', $subject->id)->get();
+                $small_groups = $curriculumClassroomGroups->filter(function ($value, $key) {
+                    return $value->classroomGroup->small_group == 1;
+                });
+                $big_groups = $curriculumClassroomGroups->filter(function ($value, $key) {
+                    return $value->classroomGroup->small_group == 0;
+                });
+                $modified = $curriculumClassroomGroups->filter(function ($value, $key) {
+                    return $value->creation_type == CreationType::MANUAL;
+                })->count() > 0;
+
+
+                $summary[] = [
+                    'subject' => $subject,
+                    'big_groups' => $big_groups->count(),
+                    'small_groups' => $small_groups->count(),
+                    'modified' => $modified
+                ];
+            }
+
             $excelFileFormat = new ExelFileFormatGD();
-            $excelFileFormat->generateExcelFile($academic_year, $curriculum, $groups, $file_path);
+            $excelFileFormat->generateExcelFile($academic_year, $curriculum, $groups, $summary, $file_path);
         }
 
         return response()->download($file_path);
@@ -97,6 +124,7 @@ class CurriculumAcademicYearController extends Controller
         foreach ($old_curriculum_subjects as $old_curriculum_subject) {
             $new_curriculum_subject = $old_curriculum_subject->replicate();
             $new_curriculum_subject->academic_year_id = $next_academic_year->id;
+            $new_curriculum_subject->creation_type = CreationType::DUPLICATED;
             $new_curriculum_subject->save();
 
             //Se buscan los grupos antiguos y se duplican
@@ -111,6 +139,7 @@ class CurriculumAcademicYearController extends Controller
                     $new_curriculum_classroom_group = $old_curriculum_classroom_group->replicate();
                     $new_curriculum_classroom_group->curriculum_subject_id = $new_curriculum_subject->id;
                     $new_curriculum_classroom_group->classroom_group_id = $new_classroom_group->id;
+                    $new_curriculum_classroom_group->creation_type = CreationType::DUPLICATED;
                     $new_curriculum_classroom_group->save();
                 }
             }

@@ -12,6 +12,7 @@ use App\Models\Combos\Duration;
 use App\Models\CurriculumSubject;
 use App\Models\Combos\SubjectType;
 use Illuminate\Routing\Controller;
+use App\Models\Combos\CreationType;
 use App\Models\CurriculumClassroomGroup;
 use App\Http\Requests\CurriculumSubjectRequest;
 
@@ -126,10 +127,13 @@ class CurriculumSubjectController extends Controller
         $curriculumSubject->duration = $request->input('duration');
         $curriculumSubject->course = $request->input('course');
         $curriculumSubject->comments = $request->input('comments');
+        $curriculumSubject->creation_type = CreationType::MANUAL;
 
         if (CurriculumSubject::where('academic_year_id', $curriculumSubject->academic_year_id)->
             where('curriculum_id', $curriculumSubject->curriculum_id)->
-            where('subject_id', $curriculumSubject->subject_id)->first() == null)
+            where('subject_id', $curriculumSubject->subject_id)->
+            where('duration', $curriculumSubject->duration)->
+            where('course', $curriculumSubject->course)->first() == null)
             {
                 $curriculumSubject->save();
 
@@ -187,7 +191,9 @@ class CurriculumSubjectController extends Controller
         if (CurriculumSubject::where('id', '!=', $curriculumSubject->id)->
             where('academic_year_id', $curriculumSubject->academic_year_id)->
             where('curriculum_id', $curriculumSubject->curriculum_id)->
-            where('subject_id', $curriculumSubject->subject_id)->first() == null)
+            where('subject_id', $curriculumSubject->subject_id)->
+            where('duration', $curriculumSubject->duration)->
+            where('course', $curriculumSubject->course)->first() == null)
             {
                 $curriculumSubject->update();
 

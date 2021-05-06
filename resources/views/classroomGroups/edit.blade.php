@@ -14,7 +14,7 @@
                         @csrf
                         <div class="shadow sm:rounded-md sm:overflow-hidden">
                             <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
-                                <x-classroom-group-component :classroomGroup="$classroomGroup" :subjects="$subjects" :durations="$durations" disabled/>
+                                <x-classroom-group-component :classroomGroup="$classroomGroup" :subjects="$subjects" :durations="$durations" :sizeGroups="$size_groups" disabled/>
                             </div>
                             <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
                             <x-button>{{ __('Actualizar') }}</x-buton>

@@ -16,6 +16,7 @@ use App\ExcelFileHandler\ExcelFileFormat;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\ExcelFileHandler\IExcelFileFormat;
+use App\Models\Combos\CreationType;
 
 class ExelFileFormatOD extends ExcelFileFormat implements IExcelFileFormat
 {
@@ -160,8 +161,8 @@ class ExelFileFormatOD extends ExcelFileFormat implements IExcelFileFormat
         $i++;
         foreach ($subjects as $subject) {
             $sheet->setCellValue('A' . strval($i), $academic_year->name);
-            $sheet->setCellValue('B' . strval($i), $subject->subject->department->code);
-            $sheet->setCellValue('C' . strval($i), $subject->subject->department->name);
+            $sheet->setCellValue('B' . strval($i), $subject->subject->department != null ? $subject->subject->department->code : '');
+            $sheet->setCellValue('C' . strval($i), $subject->subject->department != null ? $subject->subject->department->name : '');
             $sheet->setCellValue('D' . strval($i), $curriculum->code);
             $sheet->setCellValue('E' . strval($i), $curriculum->name);
             $sheet->setCellValue('F' . strval($i), $subject->subject->code);
@@ -171,10 +172,16 @@ class ExelFileFormatOD extends ExcelFileFormat implements IExcelFileFormat
             $sheet->setCellValue('J' . strval($i), $subject->duration);
             $sheet->setCellValue('K' . strval($i), $subject->type);
             $sheet->setCellValue('L' . strval($i), $subject->comments);
+
+            if ($subject->creation_type == null || $subject->creation_type == CreationType::MANUAL) {
+                $sheet->getStyle('A'.$i.':L'.$i)->applyFromArray(self::manual_data_style);    
+            } else {
+                $sheet->getStyle('A'.$i.':L'.$i)->applyFromArray(self::normal_style);
+            }
+
             $i++;
         }
 
-        $sheet->getStyle('A2:L'.($i-1))->applyFromArray(self::normal_style);
 
         $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->getColumnDimension('B')->setAutoSize(true);

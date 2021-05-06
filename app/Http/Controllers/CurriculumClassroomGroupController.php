@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ClassroomGroup;
 use App\Models\CurriculumSubject;
+use App\Models\Combos\CreationType;
 use App\Models\CurriculumClassroomGroup;
 use App\Http\Requests\UpdateCurriculumClassroomGroupRequest;
 
@@ -42,6 +43,7 @@ class CurriculumClassroomGroupController extends Controller
                     $curriculumClassroomGroup = new CurriculumClassroomGroup();
                     $curriculumClassroomGroup->classroom_group_id = $classroom_group_id;
                     $curriculumClassroomGroup->curriculum_subject_id = $curriculumSubject->id;
+                    $curriculumClassroomGroup->creation_type = CreationType::MANUAL;
                     $curriculumClassroomGroup->save();
                     
                 } else if ($offered == false && $curriculumClassroomGroup != null) {

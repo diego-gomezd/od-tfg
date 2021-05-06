@@ -63,3 +63,11 @@
         <x-input id="capacity_left" type="text" name="capacity_left" :value="$classroomGroup->capacity_left" />
     </div>
 </div>
+<div>
+    <x-label for="small_group" :value="__('Grupo reducido?')"/>
+    <div class="mt-1 flex rounded-md shadow-sm">
+        <x-combo-component name="small_group" :options="$sizeGroups" :selectedValue="$classroomGroup->small_group" required >
+        </x-combo-component>
+        
+    </div>
+</div>

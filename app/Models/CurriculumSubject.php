@@ -6,6 +6,7 @@ use App\Models\Subject;
 use App\Models\Curriculum;
 use App\Models\AcademicYear;
 use App\Models\Combos\Course;
+use App\Models\Combos\CreationType;
 use App\Models\Combos\Duration;
 use App\Models\Combos\SubjectType;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +17,7 @@ class CurriculumSubject extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['academic_year_id', 'curriculum_id', 'subject_id', 'type', 'duration', 'course', 'part_time_course', 'comments'];
+    protected $fillable = ['academic_year_id', 'curriculum_id', 'subject_id', 'type', 'duration', 'course', 'part_time_course', 'comments', 'creation_type'];
 
     public $num_groups;
 
@@ -49,7 +50,7 @@ class CurriculumSubject extends Model
     public static function getAndUpdate($academic_year_id, $curriculum_id, $subject_id, $course, $subject_duration, $subject_type, $comments)
     {
         $curriculum_subject = CurriculumSubject::firstOrCreate(['curriculum_id' => $curriculum_id, 'academic_year_id' => $academic_year_id, 
-        'subject_id' => $subject_id, 'duration' => $subject_duration]);
+        'subject_id' => $subject_id, 'duration' => $subject_duration], ['creation_type' => CreationType::IMPORTED]);
 
         $mod = false;
         if (empty($curriculum_subject->course) && $course != null) {

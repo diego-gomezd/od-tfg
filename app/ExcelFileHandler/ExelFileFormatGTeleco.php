@@ -10,6 +10,7 @@ use App\Models\AcademicYear;
 use App\Models\ClassroomGroup;
 use App\Models\CurriculumSubject;
 use App\Models\UploadedFileResult;
+use App\Models\Combos\CreationType;
 use Illuminate\Support\Facades\Log;
 use App\Models\CurriculumClassroomGroup;
 use App\ExcelFileHandler\ExcelFileFormat;
@@ -123,6 +124,8 @@ class ExelFileFormatGTeleco extends ExcelFileFormat implements IExcelFileFormat
             $classroom_capacity_left = $classroom_capacity - $classroom_num_reservas;
         }
 
+        $small_group = $this->getSmallGroupFromClassgroup($classroom_name, $classroom_code);
+
         if (!$with_error) {
             try {
                 $academic_year = AcademicYear::firstOrCreate(['name' => trim($academic_year_name)]);
@@ -138,7 +141,8 @@ class ExelFileFormatGTeleco extends ExcelFileFormat implements IExcelFileFormat
                     $classroom_capacity,
                     $classroom_capacity_left,
                     $subject_duration,
-                    null
+                    null,
+                    $small_group
                 );
 
                 $course = $this->getCourseFromClassgroup($classroom_code);
@@ -186,7 +190,7 @@ class ExelFileFormatGTeleco extends ExcelFileFormat implements IExcelFileFormat
                 null
             );
             CurriculumClassroomGroup::firstOrCreate(
-                ['classroom_group_id' => $classroom_group->id, 'curriculum_subject_id' => $curriculum_subject->id]
+                ['classroom_group_id' => $classroom_group->id, 'curriculum_subject_id' => $curriculum_subject->id], ['creation_type' => CreationType::IMPORTED]
             );
         }
     }

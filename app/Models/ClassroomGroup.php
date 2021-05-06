@@ -12,7 +12,7 @@ class ClassroomGroup extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['academic_year_id', 'subject_id', 'name', 'activity_id', 'activity_group', 'duration', 'language', 'capacity', 'capacity_left', 'location'];
+    protected $fillable = ['academic_year_id', 'subject_id', 'name', 'activity_id', 'activity_group', 'duration', 'language', 'capacity', 'capacity_left', 'location', 'small_group'];
 
     public $offered;
 
@@ -43,9 +43,18 @@ class ClassroomGroup extends Model
         return $this->duration != null ? Duration::getDuration($this->duration)['title'] : null;
     }
 
-    public static function getAnUpdate($academic_year_id, $subject_id, $classroom_code, $classroom_name, $classroom_activity_id, $classroom_language, $classroom_capacity, $classroom_capacity_left, $subject_duration, $subject_location)
+    public function isSmallGroup() {
+        $small = false;
+
+
+
+        return $small;
+    }
+
+    public static function getAnUpdate($academic_year_id, $subject_id, $classroom_code, $classroom_name, $classroom_activity_id, $classroom_language, $classroom_capacity, $classroom_capacity_left, $subject_duration, $subject_location, $small_group)
     {
-        $classroom_group = ClassroomGroup::firstOrCreate(['academic_year_id' => $academic_year_id, 'subject_id' => $subject_id, 'activity_group' => trim($classroom_code)]);
+        $classroom_group = ClassroomGroup::firstOrCreate(['academic_year_id' => $academic_year_id, 'subject_id' => $subject_id, 'activity_group' => trim($classroom_code)],
+        ['small_group' => $small_group]);
 
         $mod = false;
 
@@ -79,6 +88,10 @@ class ClassroomGroup extends Model
         }
         if (empty($classroom_group->location) && !empty($subject_location)) {
             $classroom_group->location = trim($subject_location);
+            $mod = true;
+        }
+        if (empty($classroom_group->small_group) && !empty($small_group)) {
+            $classroom_group->small_group = $small_group;
             $mod = true;
         }
         if ($mod) {

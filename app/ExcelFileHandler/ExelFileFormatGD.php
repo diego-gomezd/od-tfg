@@ -8,6 +8,7 @@ use App\Models\AcademicYear;
 use App\Models\ClassroomGroup;
 use App\Models\CurriculumSubject;
 use App\Models\UploadedFileResult;
+use App\Models\Combos\CreationType;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
@@ -16,6 +17,7 @@ use App\ExcelFileHandler\ExcelFileFormat;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\ExcelFileHandler\IExcelFileFormat;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat
 {
@@ -125,6 +127,7 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat
                 $curriculum = Curriculum::getAndUpdate($curriculum_code, $curriculum_name);
                 $subject = Subject::getAndUpdate($subject_code, $subject_name, null, null);
                 $course = $this->getCourseFromClassgroup($classroom_code);
+                $small_group = $this->getSmallGroupFromClassgroup($classroom_name, $classroom_code);
 
                 $curriculum_subject = CurriculumSubject::getAndUpdate(
                     $academic_year->id,
@@ -146,11 +149,15 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat
                     $classroom_capacity,
                     $classroom_capacity_left,
                     $subject_duration,
-                    null
+                    null,
+                    $small_group
                 );
 
                 CurriculumClassroomGroup::firstOrCreate(
-                    ['classroom_group_id' => $classroom_group->id, 'curriculum_subject_id' => $curriculum_subject->id]
+                    ['classroom_group_id' => $classroom_group->id, 'curriculum_subject_id' => $curriculum_subject->id],
+                    [
+                        'creation_type' => CreationType::IMPORTED
+                    ]
                 );
             } catch (QueryException $e) {
                 Log::error($e->getMessage());
@@ -160,15 +167,15 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat
         return $status;
     }
 
-    public function generateExcelFile($academic_year, $curriculum, $groups, $file_path)
+    public function generateExcelFile($academic_year, $curriculum, $groups, $summary, $file_path)
     {
         $spreadsheet = new Spreadsheet();
         $spreadsheet->getProperties()
             ->setCreator(Auth::user()->name)
-            ->setTitle($curriculum->code.' - '.$curriculum->name.' / Grupos '.$academic_year->name);
+            ->setTitle($curriculum->code . ' - ' . $curriculum->name . ' / Grupos ' . $academic_year->name);
 
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('GD '.$curriculum->code);
+        $sheet->setTitle('GD ' . $curriculum->code);
 
         $i = 1;
         $sheet->setCellValue('A' . strval($i), self::COLUMNS_FORMAT[0]);
@@ -185,7 +192,7 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat
         $sheet->setCellValue('L' . strval($i), self::COLUMNS_FORMAT[11]);
         $sheet->setCellValue('M' . strval($i), self::COLUMNS_FORMAT[12]);
 
-        $sheet->getStyle('A1:m1')->applyFromArray(self::title_style);
+        $sheet->getStyle('A1:M1')->applyFromArray(self::title_style);
 
         $i++;
         foreach ($groups as $group) {
@@ -202,10 +209,15 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat
             $sheet->setCellValue('K' . strval($i), $group->classroomGroup->capacity);
             $sheet->setCellValue('L' . strval($i), $group->classroomGroup->capacity_left);
             $sheet->setCellValue('M' . strval($i), $group->classroomGroup->comments);
+
+            if ($group->creation_type == null || $group->creation_type == CreationType::MANUAL) {
+                $sheet->getStyle('A' . $i . ':M' . $i)->applyFromArray(self::manual_data_style);
+            } else {
+                $sheet->getStyle('A' . $i . ':M' . $i)->applyFromArray(self::normal_style);
+            }
+
             $i++;
         }
-
-        $sheet->getStyle('A2:M'.($i-1))->applyFromArray(self::normal_style);
 
         $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->getColumnDimension('B')->setAutoSize(true);
@@ -220,6 +232,49 @@ class ExelFileFormatGD extends ExcelFileFormat implements IExcelFileFormat
         $sheet->getColumnDimension('K')->setAutoSize(true);
         $sheet->getColumnDimension('L')->setAutoSize(true);
         $sheet->getColumnDimension('M')->setAutoSize(true);
+
+        if ($summary != null) {
+            $summarySheet = new Worksheet($spreadsheet, 'Resumen');
+            $spreadsheet->addSheet($summarySheet, 1);
+
+            $i = 1;
+            $summarySheet->setCellValue('A' . strval($i), 'Asignatura');
+            $summarySheet->setCellValue('B' . strval($i), 'Caracter');
+            $summarySheet->setCellValue('C' . strval($i), 'Curso');
+            $summarySheet->setCellValue('D' . strval($i), 'Cuatrimestre');
+            $summarySheet->setCellValue('E' . strval($i), 'Departamento');
+            $summarySheet->setCellValue('F' . strval($i), 'Grupos Grandes');
+            $summarySheet->setCellValue('G' . strval($i), 'Grupos Pequeños');
+
+            $summarySheet->getStyle('A1:G1')->applyFromArray(self::title_summary_style);
+
+
+            $i++;
+            foreach ($summary as $row) {
+                $summarySheet->setCellValue('A' . strval($i), $row['subject']->subject->name);
+                $summarySheet->setCellValue('B' . strval($i), $row['subject']->type);
+                $summarySheet->setCellValue('C' . strval($i), $row['subject']->course);
+                $summarySheet->setCellValue('D' . strval($i), $row['subject']->duration);
+                $summarySheet->setCellValue('E' . strval($i), $row['subject']->subject->department != null ? $row['subject']->subject->department->code : '');
+                $summarySheet->setCellValue('F' . strval($i), $row['big_groups']);
+                $summarySheet->setCellValue('G' . strval($i), $row['small_groups']);
+
+                if ($row['modified']) {
+                    $summarySheet->getStyle('A' . $i . ':G' . $i)->applyFromArray(self::manual_data_style);
+                } else {
+                    $summarySheet->getStyle('A' . $i . ':G' . $i)->applyFromArray(self::normal_style);
+                }
+
+                $i++;
+            }
+            $summarySheet->getColumnDimension('A')->setAutoSize(true);
+            $summarySheet->getColumnDimension('B')->setAutoSize(true);
+            $summarySheet->getColumnDimension('C')->setAutoSize(true);
+            $summarySheet->getColumnDimension('D')->setAutoSize(true);
+            $summarySheet->getColumnDimension('E')->setAutoSize(true);
+            $summarySheet->getColumnDimension('F')->setAutoSize(true);
+            $summarySheet->getColumnDimension('G')->setAutoSize(true);
+        }
 
         $writer = new Xlsx($spreadsheet);
         $writer->save($file_path);

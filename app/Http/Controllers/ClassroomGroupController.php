@@ -26,7 +26,7 @@ class ClassroomGroupController extends Controller
     private function filterClassroomGroups($filter_subject_id, $filter_location, $filter_academic_year_id, $filter_duration)
     {
         $academic_year = $filter_academic_year_id ? AcademicYear::find($filter_academic_year_id) : AcademicYear::all()->last();
-        $filter_academic_year_id = $academic_year->id;
+        $filter_academic_year_id = $academic_year != null ? $academic_year->id : 0;
 
         $query = ClassroomGroup::query();
         if (!empty($filter_subject_id)) {
@@ -67,12 +67,14 @@ class ClassroomGroupController extends Controller
         $academic_year = AcademicYear::find($request->academic_year_id);
         $classroomGroup = new ClassroomGroup();
         $classroomGroup->academic_year_id = $academic_year->id;
+        $size_groups = array(["id" => '0', "title" => 'Grupo grande'], ["id" => '1', "title" => 'Grupo reducido']);
 
         return view('classroomGroups.create', [
             'academic_year' => $academic_year,
             'classroomGroup' => $classroomGroup,
             'durations' => Duration::getCombo(),
             'subjects' => Subject::all()->sortBy('name'),
+            'size_groups' => $size_groups
         ]);
     }
 
@@ -96,6 +98,7 @@ class ClassroomGroupController extends Controller
         $classroomGroup->capacity = $request->input('capacity');
         $classroomGroup->capacity_left = $request->input('capacity_left');
         $classroomGroup->location = $request->input('location');
+        $classroomGroup->small_group = $request->input('small_group') == 'true';
 
         if (ClassroomGroup::where('academic_year_id',  $classroomGroup->academic_year_id)
             ->where('subject_id',  $classroomGroup->subject_id)->where('activity_group',  $classroomGroup->activity_group)->first() == null) {
@@ -122,6 +125,7 @@ class ClassroomGroupController extends Controller
             'classroomGroup' => $classroomGroup,
             'durations' => Duration::getCombo(),
             'subjects' => Subject::all()->sortBy('name'),
+            'size_groups' => array(["id" => '0', "title" => 'Grupo grande'], ["id" => '1', "title" => 'Grupo reducido']),
         ]);
     }
 
@@ -136,6 +140,7 @@ class ClassroomGroupController extends Controller
         $classroomGroup->capacity = $request->input('capacity');
         $classroomGroup->capacity_left = $request->input('capacity_left');
         $classroomGroup->location = $request->input('location');
+        $classroomGroup->small_group =  $request->input('small_group') == 'true';
 
         if (ClassroomGroup::where('id', '!=', $classroomGroup->id)
             ->where('academic_year_id', $classroomGroup->academic_year_id)
