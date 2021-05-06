@@ -19,6 +19,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Diego',
             'email' => 'diego.gomezd@edu.uah.es',
             'password' => Hash::make('teL8eevUy4n3Uvy'),
+        ],[
+            'name' => 'Antonio J. de Vicente',
+            'email' => 'antonio.vicente@uah.es',
+            'password' => '$2y$10$UJeL//zXEY/l3NsmlWEhU.JCHWjKGpUHIo6.MZeF4NWAVOdd/M1XS',
         ]);
     }
 }
